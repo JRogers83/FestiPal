@@ -23,18 +23,30 @@ export function ColourPicker({ value, onChange }: Props) {
         <>
           <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />
           <div
-            className="absolute top-9 left-0 z-30 p-2 rounded grid grid-cols-4 gap-1"
-            style={{ backgroundColor: 'var(--colour-surface)', border: '1px solid var(--colour-border)' }}
+            className="absolute top-9 left-0 z-30 rounded"
+            style={{
+              backgroundColor: 'var(--colour-surface)',
+              border: '1px solid var(--colour-border)',
+              padding: 8,
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 32px)',
+              gap: 4,
+            }}
           >
             {USER_COLOURS.map(c => (
               <button
                 key={c.id}
                 onClick={() => { onChange(c.hex); setOpen(false) }}
-                className="w-8 h-8 rounded-full border-2 transition-all"
                 style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
                   backgroundColor: c.hex,
-                  borderColor: value === c.hex ? '#fff' : 'transparent',
+                  border: `2px solid ${value === c.hex ? '#fff' : 'transparent'}`,
                   transform: value === c.hex ? 'scale(1.15)' : 'scale(1)',
+                  transition: 'transform 0.1s, border-color 0.1s',
+                  cursor: 'pointer',
+                  flexShrink: 0,
                 }}
                 aria-label={c.label}
                 title={c.label}
