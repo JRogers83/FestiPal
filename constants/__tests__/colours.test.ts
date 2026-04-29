@@ -21,7 +21,7 @@ describe('USER_COLOURS', () => {
   })
 
   it('does not contain red or orange (reserved for brand)', () => {
-    const redOrangeIds = USER_COLOURS.filter(c => c.id === 'red' || c.id === 'orange')
+    const redOrangeIds = USER_COLOURS.filter(c => (c.id as string) === 'red' || (c.id as string) === 'orange')
     expect(redOrangeIds).toHaveLength(0)
   })
 })
