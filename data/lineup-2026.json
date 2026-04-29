@@ -1,0 +1,47 @@
+{
+  "festivalDays": [
+    { "id": "friday",   "label": "Friday 12 June",   "date": "2026-06-12", "ordinal": 1 },
+    { "id": "saturday", "label": "Saturday 13 June", "date": "2026-06-13", "ordinal": 2 },
+    { "id": "sunday",   "label": "Sunday 14 June",   "date": "2026-06-14", "ordinal": 3 }
+  ],
+  "stages": [
+    { "id": "main-stage",      "name": "Main Stage",       "ordinal": 1 },
+    { "id": "second-stage",    "name": "Second Stage",     "ordinal": 2 },
+    { "id": "opus-stage",      "name": "Opus/Dogma",       "ordinal": 3 },
+    { "id": "avalanche-stage", "name": "Avalanche Stage",  "ordinal": 4 }
+  ],
+  "acts": [
+    { "id": "fri-main-1", "name": "Spiritbox",            "stageId": "main-stage",      "festivalDayId": "friday",   "date": "2026-06-12", "startTime": "13:00", "endTime": "13:45" },
+    { "id": "fri-main-2", "name": "Sleep Token",          "stageId": "main-stage",      "festivalDayId": "friday",   "date": "2026-06-12", "startTime": "15:30", "endTime": "16:30" },
+    { "id": "fri-main-3", "name": "Parkway Drive",        "stageId": "main-stage",      "festivalDayId": "friday",   "date": "2026-06-12", "startTime": "18:00", "endTime": "19:15" },
+    { "id": "fri-main-4", "name": "Metallica",            "stageId": "main-stage",      "festivalDayId": "friday",   "date": "2026-06-12", "startTime": "21:00", "endTime": "23:00", "headliner": true },
+    { "id": "fri-sec-1",  "name": "Knocked Loose",        "stageId": "second-stage",    "festivalDayId": "friday",   "date": "2026-06-12", "startTime": "14:00", "endTime": "14:45" },
+    { "id": "fri-sec-2",  "name": "Obituary",             "stageId": "second-stage",    "festivalDayId": "friday",   "date": "2026-06-12", "startTime": "16:00", "endTime": "17:00" },
+    { "id": "fri-sec-3",  "name": "Gojira",               "stageId": "second-stage",    "festivalDayId": "friday",   "date": "2026-06-12", "startTime": "19:30", "endTime": "20:30" },
+    { "id": "fri-sec-4",  "name": "Code Orange",          "stageId": "second-stage",    "festivalDayId": "friday",   "date": "2026-06-12", "startTime": "22:00", "endTime": "23:30" },
+    { "id": "fri-opus-1", "name": "Loathe",               "stageId": "opus-stage",      "festivalDayId": "friday",   "date": "2026-06-12", "startTime": "13:30", "endTime": "14:15" },
+    { "id": "fri-opus-2", "name": "Bad Omens",            "stageId": "opus-stage",      "festivalDayId": "friday",   "date": "2026-06-12", "startTime": "17:00", "endTime": "17:45" },
+    { "id": "fri-avl-1",  "name": "Orbit Culture",        "stageId": "avalanche-stage", "festivalDayId": "friday",   "date": "2026-06-12", "startTime": "14:30", "endTime": "15:15" },
+    { "id": "fri-avl-2",  "name": "Alien Weaponry",       "stageId": "avalanche-stage", "festivalDayId": "friday",   "date": "2026-06-12", "startTime": "20:00", "endTime": "20:45" },
+    { "id": "sat-main-1", "name": "Nothing But Thieves",  "stageId": "main-stage",      "festivalDayId": "saturday", "date": "2026-06-13", "startTime": "13:00", "endTime": "14:00" },
+    { "id": "sat-main-2", "name": "Halsey",               "stageId": "main-stage",      "festivalDayId": "saturday", "date": "2026-06-13", "startTime": "16:00", "endTime": "17:00" },
+    { "id": "sat-main-3", "name": "Bring Me The Horizon", "stageId": "main-stage",      "festivalDayId": "saturday", "date": "2026-06-13", "startTime": "19:00", "endTime": "20:30" },
+    { "id": "sat-main-4", "name": "Green Day",            "stageId": "main-stage",      "festivalDayId": "saturday", "date": "2026-06-13", "startTime": "21:30", "endTime": "23:30", "headliner": true },
+    { "id": "sat-sec-1",  "name": "Palaye Royale",        "stageId": "second-stage",    "festivalDayId": "saturday", "date": "2026-06-13", "startTime": "14:30", "endTime": "15:15" },
+    { "id": "sat-sec-2",  "name": "The Hu",               "stageId": "second-stage",    "festivalDayId": "saturday", "date": "2026-06-13", "startTime": "17:30", "endTime": "18:30" },
+    { "id": "sat-sec-3",  "name": "Bad Wolves",           "stageId": "second-stage",    "festivalDayId": "saturday", "date": "2026-06-13", "startTime": "20:45", "endTime": "21:45" },
+    { "id": "sat-opus-1", "name": "Holding Absence",      "stageId": "opus-stage",      "festivalDayId": "saturday", "date": "2026-06-13", "startTime": "14:00", "endTime": "14:45" },
+    { "id": "sat-opus-2", "name": "Electric Callboy",     "stageId": "opus-stage",      "festivalDayId": "saturday", "date": "2026-06-13", "startTime": "22:30", "endTime": "00:00" },
+    { "id": "sat-avl-1",  "name": "Vended",               "stageId": "avalanche-stage", "festivalDayId": "saturday", "date": "2026-06-13", "startTime": "13:30", "endTime": "14:15" },
+    { "id": "sun-main-1", "name": "Architects",           "stageId": "main-stage",      "festivalDayId": "sunday",   "date": "2026-06-14", "startTime": "13:30", "endTime": "14:30" },
+    { "id": "sun-main-2", "name": "Ghost",                "stageId": "main-stage",      "festivalDayId": "sunday",   "date": "2026-06-14", "startTime": "16:30", "endTime": "17:45" },
+    { "id": "sun-main-3", "name": "Slash",                "stageId": "main-stage",      "festivalDayId": "sunday",   "date": "2026-06-14", "startTime": "19:15", "endTime": "20:30" },
+    { "id": "sun-main-4", "name": "Guns N' Roses",        "stageId": "main-stage",      "festivalDayId": "sunday",   "date": "2026-06-14", "startTime": "21:00", "endTime": "23:30", "headliner": true },
+    { "id": "sun-sec-1",  "name": "Bury Tomorrow",        "stageId": "second-stage",    "festivalDayId": "sunday",   "date": "2026-06-14", "startTime": "14:00", "endTime": "14:45" },
+    { "id": "sun-sec-2",  "name": "Beartooth",            "stageId": "second-stage",    "festivalDayId": "sunday",   "date": "2026-06-14", "startTime": "17:00", "endTime": "18:00" },
+    { "id": "sun-sec-3",  "name": "While She Sleeps",     "stageId": "second-stage",    "festivalDayId": "sunday",   "date": "2026-06-14", "startTime": "20:30", "endTime": "21:30" },
+    { "id": "sun-opus-1", "name": "Bleed From Within",    "stageId": "opus-stage",      "festivalDayId": "sunday",   "date": "2026-06-14", "startTime": "14:30", "endTime": "15:15" },
+    { "id": "sun-avl-1",  "name": "Spite",                "stageId": "avalanche-stage", "festivalDayId": "sunday",   "date": "2026-06-14", "startTime": "13:00", "endTime": "13:45" },
+    { "id": "sun-avl-2",  "name": "Tallah",               "stageId": "avalanche-stage", "festivalDayId": "sunday",   "date": "2026-06-14", "startTime": "22:00", "endTime": "23:00" }
+  ]
+}
