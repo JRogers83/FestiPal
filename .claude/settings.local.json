@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest *)",
+      "Bash(mv /c/code/fesipals/download-fest-spec.md /tmp/download-fest-spec.md)",
+      "Bash(echo \"Exit: $?\")"
+    ]
+  }
+}
