@@ -123,8 +123,12 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
 
       <div className="flex flex-1 overflow-hidden">
         <main
-          className="flex-1 overflow-auto"
-          style={{ padding: view === 'schedule' ? 8 : 0 }}
+          className="flex-1 overflow-y-scroll"
+          style={{
+            padding: view === 'schedule' ? 8 : 0,
+            touchAction: 'pan-y',
+            WebkitOverflowScrolling: 'touch',
+          }}
         >
           <ClashBanner clashPairs={clashPairs} />
           {view === 'schedule' ? (

@@ -14,7 +14,7 @@ type Props = {
 export function Header({ userId, nickname, colour }: Props) {
   const [editing, setEditing] = useState(false)
   const [draftName, setDraftName] = useState(nickname)
-  const [inviteUrl, setInviteUrl] = useState<string | null>(null)
+  const [shared, setShared] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const updateUser   = useUpdateUser(userId)
@@ -30,8 +30,28 @@ export function Header({ userId, nickname, colour }: Props) {
 
   async function handleInvite() {
     const url = await createInvite.mutateAsync(userId)
-    setInviteUrl(url)
-    await navigator.clipboard.writeText(url).catch(() => {})
+
+    if (navigator.share) {
+      // Native share sheet on iOS/Android — opens the system share dialog
+      try {
+        await navigator.share({
+          title: 'Festipals — Download 2026',
+          text: 'Join me on Festipals to plan Download Festival 2026!',
+          url,
+        })
+        setShared(true)
+      } catch (e) {
+        // AbortError = user dismissed the sheet — no feedback needed
+        if ((e as Error).name !== 'AbortError') {
+          await navigator.clipboard.writeText(url).catch(() => {})
+          setShared(true)
+        }
+      }
+    } else {
+      // Desktop fallback: copy to clipboard
+      await navigator.clipboard.writeText(url).catch(() => {})
+      setShared(true)
+    }
   }
 
   return (
@@ -82,7 +102,7 @@ export function Header({ userId, nickname, colour }: Props) {
           opacity: createInvite.isPending ? 0.6 : 1,
         }}
       >
-        {inviteUrl ? 'Copied!' : '+ Invite'}
+        {shared ? '✓ Shared' : '+ Invite'}
       </button>
     </header>
   )
