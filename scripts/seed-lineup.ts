@@ -10,6 +10,12 @@ const sql = neon(process.env.DATABASE_URL_UNPOOLED!)
 const db = drizzle(sql)
 
 async function seed() {
+  // Clear old lineup data before re-seeding — acts cascade to selections
+  console.log('Clearing old lineup data...')
+  await db.delete(acts)
+  await db.delete(stages)
+  await db.delete(festivalDays)
+
   console.log('Seeding festival_days...')
   await db
     .insert(festivalDays)

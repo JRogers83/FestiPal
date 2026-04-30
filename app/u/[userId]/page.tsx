@@ -13,7 +13,9 @@ export default async function SchedulePage({ params, searchParams }: Props) {
   const { day } = await searchParams
 
   const lineup = await getLineup()
-  const defaultDay = lineup.festivalDays[0]?.id ?? 'friday'
+  // Default to first day that actually has acts scheduled
+  const daysWithActs = new Set(lineup.acts.map(a => a.festivalDayId))
+  const defaultDay = lineup.festivalDays.find(d => daysWithActs.has(d.id))?.id ?? 'friday'
   const activeDay = day ?? defaultDay
 
   const rawUser = await getUserById(userId)
