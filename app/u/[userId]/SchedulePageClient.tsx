@@ -81,7 +81,7 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
       />
 
       {/* Tab bar: day tabs + schedule/artists view toggle */}
-      <div style={{ display: 'flex', alignItems: 'stretch', borderBottom: '1px solid var(--colour-border)' }}>
+      <div style={{ display: 'flex', alignItems: 'stretch', borderBottom: '1px solid var(--colour-border)', overflow: 'hidden' }}>
         <DayTabs days={lineup.festivalDays} activeDay={activeDay} userId={userId} />
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', padding: '0 8px', gap: 4, flexShrink: 0 }}>
           <button
@@ -124,11 +124,7 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
       <div className="flex flex-1 overflow-hidden">
         <main
           className="flex-1 overflow-y-scroll"
-          style={{
-            padding: view === 'schedule' ? 8 : 0,
-            touchAction: 'pan-y',
-            WebkitOverflowScrolling: 'touch',
-          }}
+          style={{ padding: view === 'schedule' ? 8 : 0 }}
         >
           <ClashBanner clashPairs={clashPairs} />
           {view === 'schedule' ? (
