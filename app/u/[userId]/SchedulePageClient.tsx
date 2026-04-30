@@ -11,6 +11,7 @@ import { DayTabs } from '@/components/DayTabs'
 import { ScheduleGrid } from '@/components/schedule/ScheduleGrid'
 import { ClashBanner } from '@/components/schedule/ClashBanner'
 import { PeoplePanel } from '@/components/people/PeoplePanel'
+import { ArtistsList } from '@/components/ArtistsList'
 
 type Props = {
   userId: string
@@ -34,6 +35,7 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
   }
 
   const [checkedUserIds, setCheckedUserIds] = useState<Set<string>>(() => new Set([userId]))
+  const [view, setView] = useState<'schedule' | 'artists'>('schedule')
 
   function handleCheckChange(uid: string, checked: boolean) {
     setCheckedUserIds(prev => {
@@ -78,21 +80,76 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
         colour={currentUser.colour}
       />
 
-      <DayTabs days={lineup.festivalDays} activeDay={activeDay} userId={userId} />
+      {/* Tab bar: day tabs + schedule/artists view toggle */}
+      <div style={{ display: 'flex', alignItems: 'stretch', borderBottom: '1px solid var(--colour-border)' }}>
+        <DayTabs days={lineup.festivalDays} activeDay={activeDay} userId={userId} />
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', padding: '0 8px', gap: 4, flexShrink: 0 }}>
+          <button
+            onClick={() => setView('schedule')}
+            title="Schedule view"
+            style={{
+              padding: '4px 10px',
+              fontSize: 11,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              backgroundColor: view === 'schedule' ? 'var(--colour-primary)' : 'var(--colour-surface-2)',
+              color: view === 'schedule' ? '#fff' : 'var(--colour-text-muted)',
+              border: 'none',
+              borderRadius: 3,
+              cursor: 'pointer',
+            }}
+          >
+            Grid
+          </button>
+          <button
+            onClick={() => setView('artists')}
+            title="Artists list"
+            style={{
+              padding: '4px 10px',
+              fontSize: 11,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              backgroundColor: view === 'artists' ? 'var(--colour-primary)' : 'var(--colour-surface-2)',
+              color: view === 'artists' ? '#fff' : 'var(--colour-text-muted)',
+              border: 'none',
+              borderRadius: 3,
+              cursor: 'pointer',
+            }}
+          >
+            Artists
+          </button>
+        </div>
+      </div>
 
       <div className="flex flex-1 overflow-hidden">
-        <main className="flex-1 overflow-auto p-2">
+        <main
+          className="flex-1 overflow-auto"
+          style={{ padding: view === 'schedule' ? 8 : 0 }}
+        >
           <ClashBanner clashPairs={clashPairs} />
-          <ScheduleGrid
-            acts={dayActs}
-            stages={lineup.stages}
-            currentUserId={userId}
-            currentUserColour={currentUser.colour}
-            currentUserSelections={currentUser.selections}
-            checkedUsers={allCheckedUsers}
-            clashPairs={clashPairs}
-            onToggleSelection={handleToggle}
-          />
+          {view === 'schedule' ? (
+            <ScheduleGrid
+              acts={dayActs}
+              stages={lineup.stages}
+              currentUserId={userId}
+              currentUserColour={currentUser.colour}
+              currentUserSelections={currentUser.selections}
+              checkedUsers={allCheckedUsers}
+              clashPairs={clashPairs}
+              onToggleSelection={handleToggle}
+            />
+          ) : (
+            <ArtistsList
+              acts={dayActs}
+              stages={lineup.stages}
+              currentUserId={userId}
+              currentUserColour={currentUser.colour}
+              currentUserSelections={currentUser.selections}
+              checkedUsers={allCheckedUsers}
+              clashPairs={clashPairs}
+              onToggleSelection={handleToggle}
+            />
+          )}
         </main>
 
         <PeoplePanel
