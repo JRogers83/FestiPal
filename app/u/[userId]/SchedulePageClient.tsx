@@ -34,13 +34,22 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
     selections: [],
   }
 
-  const [checkedUserIds, setCheckedUserIds] = useState<Set<string>>(() => new Set([userId]))
   const [view, setView] = useState<'schedule' | 'artists'>('schedule')
 
+  // Track IDs the user has explicitly unchecked. Everyone else (self + all
+  // connections) is checked by default, including newly joined members.
+  const [uncheckedIds, setUncheckedIds] = useState<Set<string>>(new Set())
+
+  const checkedUserIds = useMemo(() => {
+    const all = new Set([userId, ...connections.map(c => c.user.id)])
+    uncheckedIds.forEach(id => all.delete(id))
+    return all
+  }, [userId, connections, uncheckedIds])
+
   function handleCheckChange(uid: string, checked: boolean) {
-    setCheckedUserIds(prev => {
+    setUncheckedIds(prev => {
       const next = new Set(prev)
-      checked ? next.add(uid) : next.delete(uid)
+      checked ? next.delete(uid) : next.add(uid)
       return next
     })
   }

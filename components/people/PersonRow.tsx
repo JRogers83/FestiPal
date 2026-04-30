@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 type Props = {
   userId: string
   nickname: string
@@ -11,6 +13,50 @@ type Props = {
 }
 
 export function PersonRow({ nickname, colour, checked, isCurrentUser, onCheckChange, onRemove }: Props) {
+  const [confirming, setConfirming] = useState(false)
+
+  if (confirming) {
+    return (
+      <div className="py-2">
+        <p className="text-xs mb-2" style={{ color: 'var(--colour-text)', lineHeight: 1.5 }}>
+          Remove <strong>{nickname}</strong> from your group?
+        </p>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button
+            onClick={() => { onRemove?.(); setConfirming(false) }}
+            className="text-xs uppercase tracking-wide font-medium"
+            style={{
+              flex: 1,
+              padding: '5px 0',
+              backgroundColor: 'var(--colour-primary)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 3,
+              cursor: 'pointer',
+            }}
+          >
+            Yes, remove
+          </button>
+          <button
+            onClick={() => setConfirming(false)}
+            className="text-xs uppercase tracking-wide"
+            style={{
+              flex: 1,
+              padding: '5px 0',
+              backgroundColor: 'var(--colour-surface-2)',
+              color: 'var(--colour-text-muted)',
+              border: '1px solid var(--colour-border)',
+              borderRadius: 3,
+              cursor: 'pointer',
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex items-center gap-3 py-2">
       <span
@@ -33,9 +79,17 @@ export function PersonRow({ nickname, colour, checked, isCurrentUser, onCheckCha
       </label>
       {!isCurrentUser && onRemove && (
         <button
-          onClick={onRemove}
-          className="text-xs px-1 transition-colors"
-          style={{ color: 'var(--colour-text-faint)' }}
+          onClick={() => setConfirming(true)}
+          className="transition-colors"
+          style={{
+            color: 'var(--colour-primary)',
+            fontSize: 16,
+            lineHeight: 1,
+            padding: '0 4px',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+          }}
           aria-label={`Remove ${nickname}`}
         >
           ✕
