@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getUserById, updateUser } from '@/lib/db/queries/users'
+import { createUser, getUserById, updateUser } from '@/lib/db/queries/users'
 
 export async function GET(_req: Request, { params }: { params: Promise<{ userId: string }> }) {
   const { userId } = await params
@@ -19,6 +19,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ us
     if (typeof body.colour === 'string') {
       data.colour = body.colour
     }
+    await createUser(userId).catch(() => {})
     const user = await updateUser(userId, data)
     if (!user) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     return NextResponse.json(user)

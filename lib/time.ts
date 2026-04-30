@@ -33,3 +33,7 @@ export function dayBounds(acts: { startTime: string; endTime: string }[]): DayBo
 export function minutesToPx(minutes: number): number {
   return minutes * PX_PER_MINUTE
 }
+
+export function formatTime(time: string): string {
+  return time.slice(0, 5)
+}

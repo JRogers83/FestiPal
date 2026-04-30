@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import type { Lineup, UserWithSelections } from '@/types'
-import { useUser, useEnsureUser } from '@/lib/hooks/use-user'
+import { useUser } from '@/lib/hooks/use-user'
 import { useToggleSelection } from '@/lib/hooks/use-selections'
 import { useConnections } from '@/lib/hooks/use-connections'
 import { detectClashes } from '@/lib/clash-detection'
@@ -20,8 +20,6 @@ type Props = {
 }
 
 export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: Props) {
-  const ensureUser = useEnsureUser(userId)
-
   const { data: userData } = useUser(userId)
   const { data: connections = [] } = useConnections(userId)
   const toggleSelection = useToggleSelection(userId)
@@ -68,10 +66,9 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
     [allCheckedUsers, dayActs]
   )
 
-  function handleToggle(actId: string, isSelected: boolean) {
-    ensureUser.mutate()
+  const handleToggle = useCallback((actId: string, isSelected: boolean) => {
     toggleSelection.mutate({ actId, selected: isSelected })
-  }
+  }, [toggleSelection])
 
   return (
     <div className="flex flex-col h-screen">

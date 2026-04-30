@@ -4,10 +4,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { User, UserWithSelections } from '@/types'
 
 export function useUser(userId: string) {
-  return useQuery<UserWithSelections>({
+  return useQuery<UserWithSelections | null>({
     queryKey: ['user', userId],
     queryFn: async () => {
       const res = await fetch(`/api/users/${userId}`)
+      if (res.status === 404) return null
       if (!res.ok) throw new Error('User not found')
       return res.json()
     },

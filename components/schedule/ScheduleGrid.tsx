@@ -137,7 +137,7 @@ export function ScheduleGrid({
                     selectedByOthers={selectedByOthers}
                     isClashing={clashingActIds.has(act.id)}
                     clashColour={clashColourMap.get(act.id)}
-                    onToggle={() => onToggleSelection(act.id, isSelected)}
+                    onToggle={onToggleSelection}
                   />
                 )
               })}

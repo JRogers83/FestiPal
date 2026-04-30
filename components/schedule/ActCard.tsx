@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import type { Act } from '@/types'
 
 type OtherUser = { userId: string; colour: string }
@@ -13,10 +14,10 @@ type Props = {
   selectedByOthers: OtherUser[]
   isClashing: boolean
   clashColour: string | undefined
-  onToggle: () => void
+  onToggle: (actId: string, isSelected: boolean) => void
 }
 
-export function ActCard({
+export const ActCard = memo(function ActCard({
   act,
   top,
   height,
@@ -40,7 +41,7 @@ export function ActCard({
 
   return (
     <button
-      onClick={onToggle}
+      onClick={() => onToggle(act.id, isSelected)}
       style={{
         position: 'absolute',
         top,
@@ -69,7 +70,7 @@ export function ActCard({
           {act.headliner ? <strong>{act.name}</strong> : act.name}
         </p>
         <p className="text-[10px]" style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : 'var(--colour-text-muted)' }}>
-          {act.startTime}
+          {act.startTime.slice(0, 5)}
         </p>
       </div>
 
@@ -97,4 +98,4 @@ export function ActCard({
       )}
     </button>
   )
-}
+})
