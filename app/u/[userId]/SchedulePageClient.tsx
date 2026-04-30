@@ -141,12 +141,14 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
           ) : (
             <ArtistsList
               acts={dayActs}
+              allActs={lineup.acts}
               stages={lineup.stages}
+              festivalDays={lineup.festivalDays}
+              activeDay={activeDay}
               currentUserId={userId}
               currentUserColour={currentUser.colour}
               currentUserSelections={currentUser.selections}
               checkedUsers={allCheckedUsers}
-              clashPairs={clashPairs}
               onToggleSelection={handleToggle}
             />
           )}
