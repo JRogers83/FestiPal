@@ -79,7 +79,7 @@ export function ScheduleGrid({
 
   return (
     <div
-      className="overflow-x-auto"
+      className="overflow-x-auto overflow-y-hidden"
       style={{ overscrollBehaviorX: 'contain', touchAction: 'pan-x' }}
     >
       <div className="flex min-w-max">
