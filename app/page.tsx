@@ -18,7 +18,7 @@ export default function LandingPage() {
       position: 'relative',
       overflow: 'hidden',
       backgroundColor: '#080808',
-      padding: '2rem 1.5rem 0',
+      padding: '2rem 1.5rem 240px',
     }}>
 
       {/* ── Background layers ── */}
@@ -115,12 +115,6 @@ export default function LandingPage() {
         textTransform: 'uppercase',
         letterSpacing: '0.03em',
         color: '#e8192c',
-        textShadow: [
-          '0 0 15px rgba(232,25,44,1)',
-          '0 0 35px rgba(232,25,44,0.75)',
-          '0 0 70px rgba(232,25,44,0.45)',
-          '0 0 120px rgba(200,0,20,0.25)',
-        ].join(', '),
         lineHeight: 0.88,
         marginBottom: '1.1rem',
         position: 'relative',
