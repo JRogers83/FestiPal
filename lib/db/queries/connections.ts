@@ -41,3 +41,8 @@ export async function getConnectionsForUser(userId: string) {
 export async function removeConnectionById(connectionId: string) {
   await db.delete(connections).where(eq(connections.id, connectionId))
 }
+
+export async function createDirectConnection(userIdA: string, userIdB: string) {
+  const [userA, userB] = [userIdA, userIdB].sort() as [string, string]
+  await db.insert(connections).values({ userA, userB }).onConflictDoNothing()
+}

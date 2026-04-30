@@ -25,3 +25,20 @@ export function useRemoveConnection(userId: string) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['connections', userId] }),
   })
 }
+
+export function useAddDirectConnection(userId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: { targetUserId?: string; token?: string }): Promise<{ nickname: string }> => {
+      const res = await fetch('/api/connections/direct', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, ...payload }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to connect')
+      return data
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['connections', userId] }),
+  })
+}

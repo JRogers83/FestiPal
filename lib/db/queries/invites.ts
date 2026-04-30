@@ -19,6 +19,13 @@ export type RedeemResult =
   | { success: true }
   | { success: false; reason: 'not_found' | 'already_used' | 'self_invite' }
 
+export async function markInviteUsed(token: string, usedBy: string) {
+  await db
+    .update(inviteTokens)
+    .set({ usedAt: new Date(), usedBy })
+    .where(eq(inviteTokens.token, token))
+}
+
 export async function redeemInvite(token: string, visitorId: string): Promise<RedeemResult> {
   const invite = await getInviteByToken(token)
 
