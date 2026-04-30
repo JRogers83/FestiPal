@@ -11,19 +11,20 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background-color: #080707;          /* fallback if image hasn't loaded */
-  padding: 2rem 1.5rem 200px;
+  background-color: #080707;
+  padding: 1.5rem 1.5rem 190px;
 }
 
 @media (max-width: 600px) {
   .landing {
-    padding: 1.5rem 1rem 130px;
+    padding: 1rem 1rem 120px;
   }
 }
 
 /* ── Image layer ──────────────────────────────
-   cover + center = always crops from the middle,
-   never shrinks the image on mobile.           */
+   scale(1.12) zooms the image slightly so the
+   burst edges push out toward the screen edges.
+   cover + center underneath ensures no gaps.   */
 .poster-art {
   position: absolute;
   inset: 0;
@@ -31,36 +32,37 @@
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
+  transform: scale(1.12);
   z-index: 1;
   pointer-events: none;
 }
 
 /* ── Readability overlay ──────────────────────
-   Sits between image and text.
-   Radial: transparent at the burst centre,
-   dark at the edges (vignette).
-   Linear: darkens the very top and bottom.     */
+   Circular vignette pulls focus to centre.
+   Linear gradient seals top and bottom.        */
 .poster-overlay {
   position: absolute;
   inset: 0;
   background:
     radial-gradient(
-      ellipse 90% 75% at 50% 42%,
-      rgba(4,1,1,0.08) 0%,
-      rgba(4,1,1,0.72) 100%
+      circle,
+      transparent 40%,
+      rgba(0,0,0,0.62) 100%
     ),
     linear-gradient(
       to bottom,
-      rgba(0,0,0,0.40) 0%,
-      rgba(0,0,0,0.0)  28%,
-      rgba(0,0,0,0.0)  62%,
-      rgba(0,0,0,0.65) 100%
+      rgba(0,0,0,0.38) 0%,
+      rgba(0,0,0,0.0)  22%,
+      rgba(0,0,0,0.0)  60%,
+      rgba(0,0,0,0.72) 100%
     );
   z-index: 2;
   pointer-events: none;
 }
 
-/* ── Hero card ── */
+/* ── Hero card ──
+   overflow: visible so the oversized title can
+   bleed past the container boundary.           */
 .hero-card {
   position: relative;
   z-index: 10;
@@ -69,7 +71,9 @@
   align-items: center;
   text-align: center;
   max-width: min(92vw, 800px);
-  padding: 0.5rem 1rem;
+  padding: 0;
+  overflow: visible;
+  gap: 0;
 }
 
 /* ── Event eyebrow ── */
@@ -83,25 +87,26 @@
   color: #f4ede0;
   background-color: #c8000f;
   padding: 4px 20px 3px;
-  margin-bottom: 0.6rem;
-  /* Hard shadow — no blur */
+  margin-bottom: 0.3rem;
   box-shadow: 3px 3px 0 #0c0000;
 }
 
-/* ── Title ── */
+/* ── Title ──
+   Oversized so it visually breaks past the
+   central burst area rather than sitting in it. */
 .hero-card h1 {
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 800;
-  font-size: clamp(5.5rem, 16vw, 14rem);
+  font-size: clamp(6rem, 20vw, 17rem);
   text-transform: uppercase;
   letter-spacing: -0.04em;
   line-height: 0.85;
   color: #f4ede0;
-  /* Hard red offset + black depth — no blur */
+  white-space: nowrap;
   text-shadow:
     4px  5px 0 #c8000f,
     8px 10px 0 #0a0000;
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.15rem;
 }
 
 /* ── Subtitle strapline ── */
@@ -113,26 +118,27 @@
   letter-spacing: 0.06em;
   line-height: 1.25;
   color: #ede5d6;
-  /* Subtle black shadow for image contrast */
   text-shadow: 2px 2px 0 #0a0000;
-  margin: 0 0 1.1rem;
+  margin: 0 0 0.55rem;
 }
 
 /* ── Body note ── */
 .hero-note {
   font-family: 'Barlow', sans-serif;
-  font-size: clamp(0.9rem, 1.8vw, 1.05rem);
-  line-height: 1.65;
-  /* Warm off-white — strong contrast on dark image (≥9:1 on #080707) */
+  font-size: clamp(0.88rem, 1.8vw, 1.05rem);
+  line-height: 1.6;
   color: #d0c4b0;
-  margin: 0 0 2.1rem;
+  margin: 0 0 1.1rem;
   max-width: 370px;
   text-shadow: 1px 1px 4px rgba(0,0,0,0.9);
 }
 
-/* ── CTA ── */
+/* ── CTA ──
+   Nudged right of centre so it doesn't sit on
+   a perfectly symmetrical axis — more stuck-on. */
 .landing-form {
   position: relative;
+  margin-left: 2rem;
 }
 
 .landing-btn {
@@ -144,24 +150,23 @@
   letter-spacing: 0.14em;
   color: #f4ede0;
   background-color: #c8000f;
-  /* Thick dark border + hard offset shadow = physical sticker look */
   border: 3px solid #0c0000;
   padding: 0.9rem 3.2rem;
   border-radius: 2px;
   cursor: pointer;
-  transform: rotate(-1deg);
+  transform: rotate(-1.5deg) translateX(4px);
   box-shadow: 5px 5px 0 #0c0000;
   transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.12s ease;
 }
 
 .landing-btn:hover {
-  transform: rotate(0deg) translateY(-2px);
+  transform: rotate(-0.5deg) translateY(-2px) translateX(4px);
   box-shadow: 6px 7px 0 #0c0000;
   background-color: #e2000f;
 }
 
 .landing-btn:active {
-  transform: rotate(-0.5deg) translateY(1px);
+  transform: rotate(-1deg) translateY(1px) translateX(4px);
   box-shadow: 3px 3px 0 #0c0000;
 }
 
@@ -184,9 +189,9 @@
 @media (prefers-reduced-motion: reduce) {
   .landing-btn {
     transition: none;
-    transform: rotate(-1deg);
+    transform: rotate(-1.5deg) translateX(4px);
   }
   .landing-btn:hover {
-    transform: rotate(-1deg);
+    transform: rotate(-1.5deg) translateX(4px);
   }
 }
