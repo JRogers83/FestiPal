@@ -11,91 +11,69 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background-color: #080707;
+  background-color: #080707;          /* fallback if image hasn't loaded */
   padding: 2rem 1.5rem 200px;
 }
 
 @media (max-width: 600px) {
   .landing {
-    padding: 1.5rem 1rem 140px;
+    padding: 1.5rem 1rem 130px;
   }
 }
 
-/* ── Background ── */
-
-/* Radial red vignette from centre + outer black vignette */
-.landing-bg {
+/* ── Image layer ──────────────────────────────
+   cover + center = always crops from the middle,
+   never shrinks the image on mobile.           */
+.poster-art {
   position: absolute;
   inset: 0;
-  pointer-events: none;
+  background-image: url('/festipals-burst.webp');
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
   z-index: 1;
-  background:
-    radial-gradient(ellipse 78% 52% at 50% 43%, rgba(148,0,14,0.17) 0%, transparent 56%),
-    radial-gradient(ellipse 130% 110% at 50% 50%, transparent 46%, rgba(0,0,0,0.6) 100%);
-}
-
-/* Grain overlay */
-.grain-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.07;
-  mix-blend-mode: overlay;
-}
-
-/* ── Decorative layers ── */
-
-.splatter-layer,
-.bolt-layer {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
   pointer-events: none;
 }
 
-.splatter-layer { z-index: 2; }
-.bolt-layer     { z-index: 3; animation: bolt-flicker 9s step-end infinite; }
+/* ── Readability overlay ──────────────────────
+   Sits between image and text.
+   Radial: transparent at the burst centre,
+   dark at the edges (vignette).
+   Linear: darkens the very top and bottom.     */
+.poster-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 90% 75% at 50% 42%,
+      rgba(4,1,1,0.08) 0%,
+      rgba(4,1,1,0.72) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.40) 0%,
+      rgba(0,0,0,0.0)  28%,
+      rgba(0,0,0,0.0)  62%,
+      rgba(0,0,0,0.65) 100%
+    );
+  z-index: 2;
+  pointer-events: none;
+}
 
 /* ── Hero card ── */
-
 .hero-card {
   position: relative;
-  isolation: isolate;    /* own stacking context so burst z-index:-1 clips behind content */
   z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  max-width: min(90vw, 740px);
+  max-width: min(92vw, 800px);
   padding: 0.5rem 1rem;
 }
 
-/* ── Explosion badge ── */
-
-.poster-burst {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(130vw, 680px);
-  height: min(130vw, 680px);
-  pointer-events: none;
-  z-index: -1;                          /* behind siblings in hero-card stacking context */
-  animation: burst-pulse 4.5s ease-in-out infinite;
-}
-
-.poster-burst svg {
-  width: 100%;
-  height: 100%;
-}
-
 /* ── Event eyebrow ── */
-
 .eyebrow {
-  position: relative;
-  z-index: 1;
   display: inline-block;
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 700;
@@ -104,94 +82,87 @@
   letter-spacing: 0.28em;
   color: #f4ede0;
   background-color: #c8000f;
-  padding: 4px 18px 3px;
-  margin-bottom: 0.55rem;
+  padding: 4px 20px 3px;
+  margin-bottom: 0.6rem;
+  /* Hard shadow — no blur */
   box-shadow: 3px 3px 0 #0c0000;
 }
 
 /* ── Title ── */
-
 .hero-card h1 {
-  position: relative;
-  z-index: 1;
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 800;
-  font-size: clamp(5rem, 13vw, 13rem);
+  font-size: clamp(5.5rem, 16vw, 14rem);
   text-transform: uppercase;
   letter-spacing: -0.04em;
   line-height: 0.85;
   color: #f4ede0;
-  /* Red offset + black depth — hard, no blur */
+  /* Hard red offset + black depth — no blur */
   text-shadow:
-    3px  4px 0 #c8000f,
-    6px  8px 0 #110000;
-  margin: 0 0 0.45rem;
+    4px  5px 0 #c8000f,
+    8px 10px 0 #0a0000;
+  margin: 0 0 0.5rem;
 }
 
 /* ── Subtitle strapline ── */
-
 .hero-card h2 {
-  position: relative;
-  z-index: 1;
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 700;
-  font-size: clamp(1.05rem, 3vw, 1.8rem);
+  font-size: clamp(1.15rem, 3.5vw, 2rem);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  line-height: 1.3;
-  color: #e8e0d0;
+  line-height: 1.25;
+  color: #ede5d6;
+  /* Subtle black shadow for image contrast */
+  text-shadow: 2px 2px 0 #0a0000;
   margin: 0 0 1.1rem;
 }
 
 /* ── Body note ── */
-
 .hero-note {
-  position: relative;
-  z-index: 1;
   font-family: 'Barlow', sans-serif;
-  font-size: clamp(0.88rem, 1.8vw, 1.05rem);
+  font-size: clamp(0.9rem, 1.8vw, 1.05rem);
   line-height: 1.65;
-  /* Warm mid-grey — passes WCAG AA on #080707 (contrast ~9:1) */
-  color: #c8bca8;
-  margin: 0 0 2rem;
-  max-width: 360px;
+  /* Warm off-white — strong contrast on dark image (≥9:1 on #080707) */
+  color: #d0c4b0;
+  margin: 0 0 2.1rem;
+  max-width: 370px;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.9);
 }
 
 /* ── CTA ── */
-
 .landing-form {
   position: relative;
-  z-index: 1;
 }
 
 .landing-btn {
   display: inline-block;
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 700;
-  font-size: clamp(1.05rem, 2.5vw, 1.45rem);
+  font-size: clamp(1.1rem, 2.8vw, 1.55rem);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   color: #f4ede0;
   background-color: #c8000f;
+  /* Thick dark border + hard offset shadow = physical sticker look */
   border: 3px solid #0c0000;
-  padding: 0.85rem 2.8rem;
+  padding: 0.9rem 3.2rem;
   border-radius: 2px;
   cursor: pointer;
-  /* Gig-poster sticker: slight rotation + hard offset shadow */
   transform: rotate(-1deg);
-  box-shadow: 4px 4px 0 #0c0000;
+  box-shadow: 5px 5px 0 #0c0000;
   transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.12s ease;
 }
 
 .landing-btn:hover {
   transform: rotate(0deg) translateY(-2px);
-  box-shadow: 5px 6px 0 #0c0000;
+  box-shadow: 6px 7px 0 #0c0000;
   background-color: #e2000f;
 }
 
 .landing-btn:active {
   transform: rotate(-0.5deg) translateY(1px);
-  box-shadow: 2px 2px 0 #0c0000;
+  box-shadow: 3px 3px 0 #0c0000;
 }
 
 .landing-btn:focus-visible {
@@ -200,7 +171,6 @@
 }
 
 /* ── Crowd silhouette ── */
-
 .crowd-layer {
   position: absolute;
   bottom: 0;
@@ -210,24 +180,13 @@
   z-index: 8;
 }
 
-/* ── Keyframes ── */
-
-@keyframes burst-pulse {
-  0%, 100% { opacity: 0.88; transform: translate(-50%, -50%) scale(1);    }
-  50%       { opacity: 1.0;  transform: translate(-50%, -50%) scale(1.04); }
-}
-
-@keyframes bolt-flicker {
-  0%, 82%, 84%, 88%, 100% { opacity: 0.26; }
-  83%, 87%                { opacity: 0.82; }
-  85%                     { opacity: 0.04; }
-}
-
 /* ── Reduced motion ── */
-
 @media (prefers-reduced-motion: reduce) {
-  .poster-burst { animation: none; opacity: 1; }
-  .bolt-layer   { animation: none; opacity: 0.3; }
-  .landing-btn  { transition: none; transform: rotate(-1deg); }
-  .landing-btn:hover { transform: rotate(-1deg); }
+  .landing-btn {
+    transition: none;
+    transform: rotate(-1deg);
+  }
+  .landing-btn:hover {
+    transform: rotate(-1deg);
+  }
 }
