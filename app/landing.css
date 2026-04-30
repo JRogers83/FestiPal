@@ -1,0 +1,58 @@
+@keyframes burst-pulse {
+  0%, 100% { opacity: 0.42; transform: translate(-50%, -50%) scale(1); }
+  50%       { opacity: 0.82; transform: translate(-50%, -50%) scale(1.13); }
+}
+
+@keyframes burst-outer {
+  0%, 100% { opacity: 0.16; transform: translate(-50%, -50%) scale(1); }
+  50%       { opacity: 0.36; transform: translate(-50%, -50%) scale(1.11); }
+}
+
+@keyframes float-up {
+  0%   { transform: translateY(0);     opacity: 0;   }
+  12%  { opacity: 0.9; }
+  85%  { opacity: 0.55; }
+  100% { transform: translateY(-160px); opacity: 0; }
+}
+
+@keyframes lightning-flicker {
+  0%, 87%, 89%, 93%, 100% { opacity: 0.22; }
+  88%, 92%                { opacity: 0.78; }
+  90%                     { opacity: 0.08; }
+}
+
+@keyframes btn-glow {
+  0%, 100% { box-shadow: 0 0 18px rgba(225,6,0,0.55), 0 0 42px rgba(225,6,0,0.2),  0 4px 20px rgba(0,0,0,0.5); }
+  50%      { box-shadow: 0 0 30px rgba(225,6,0,0.78), 0 0 66px rgba(225,6,0,0.38), 0 4px 20px rgba(0,0,0,0.5); }
+}
+
+/* Burst layers */
+.burst-outer {
+  animation: burst-outer 3.8s ease-in-out infinite;
+}
+
+.burst-inner {
+  animation: burst-pulse 2.6s ease-in-out infinite;
+}
+
+/* Lightning */
+.lightning-layer {
+  animation: lightning-flicker 7s step-end infinite;
+}
+
+/* CTA button */
+.landing-btn {
+  animation: btn-glow 2.6s ease-in-out infinite;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.landing-btn:hover {
+  transform: scale(1.05);
+  filter: brightness(1.18);
+  animation-play-state: paused;
+}
+
+.landing-btn:active {
+  transform: scale(0.97);
+  filter: brightness(0.9);
+}
