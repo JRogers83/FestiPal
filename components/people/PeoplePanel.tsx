@@ -36,9 +36,9 @@ export function PeoplePanel({ userId, currentUser, checkedUserIds, onCheckChange
           top: '50%',
           transform: 'translateX(-100%) translateY(-50%)',
           zIndex: 20,
-          width: 28,
-          height: 80,
-          borderRadius: '8px 0 0 8px',
+          width: 36,
+          height: 96,
+          borderRadius: '10px 0 0 10px',
           backgroundColor: 'var(--colour-surface)',
           border: '1px solid var(--colour-border)',
           borderRight: 'none',
@@ -47,22 +47,20 @@ export function PeoplePanel({ userId, currentUser, checkedUserIds, onCheckChange
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
-          gap: 4,
+          gap: 6,
         }}
       >
-        {/* Chunky chevron — two thick lines */}
         <span style={{
-          fontSize: 14,
-          color: 'var(--colour-text-muted)',
+          fontSize: 22,
+          color: 'var(--colour-primary)',
           lineHeight: 1,
           userSelect: 'none',
         }}>
           {open ? '›' : '‹'}
         </span>
-        {/* Vertical "Group" label */}
         <span style={{
-          fontSize: 11,
-          color: 'var(--colour-text-faint)',
+          fontSize: 13,
+          color: 'var(--colour-primary)',
           textTransform: 'uppercase',
           letterSpacing: '0.1em',
           writingMode: 'vertical-rl',
