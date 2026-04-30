@@ -169,5 +169,6 @@ h1, h2, h3 {
   }
   html {
     @apply font-sans;
+    font-size: 17px;
   }
 }

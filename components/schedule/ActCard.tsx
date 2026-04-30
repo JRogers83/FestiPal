@@ -69,7 +69,7 @@ export const ActCard = memo(function ActCard({
         >
           {act.headliner ? <strong>{act.name}</strong> : act.name}
         </p>
-        <p className="text-[10px]" style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : 'var(--colour-text-muted)' }}>
+        <p className="text-xs" style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : 'var(--colour-text-muted)' }}>
           {act.startTime.slice(0, 5)}
         </p>
       </div>
@@ -90,7 +90,7 @@ export const ActCard = memo(function ActCard({
             />
           ))}
           {overflow > 0 && (
-            <span className="text-[9px]" style={{ color: 'var(--colour-text-muted)' }}>
+            <span className="text-[11px]" style={{ color: 'var(--colour-text-muted)' }}>
               +{overflow}
             </span>
           )}

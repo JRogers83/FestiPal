@@ -89,7 +89,7 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
             title="Schedule view"
             style={{
               padding: '4px 10px',
-              fontSize: 11,
+              fontSize: 13,
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
               backgroundColor: view === 'schedule' ? 'var(--colour-primary)' : 'var(--colour-surface-2)',
@@ -106,7 +106,7 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
             title="Artists list"
             style={{
               padding: '4px 10px',
-              fontSize: 11,
+              fontSize: 13,
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
               backgroundColor: view === 'artists' ? 'var(--colour-primary)' : 'var(--colour-surface-2)',

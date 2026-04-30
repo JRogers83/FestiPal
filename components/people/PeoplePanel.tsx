@@ -61,7 +61,7 @@ export function PeoplePanel({ userId, currentUser, checkedUserIds, onCheckChange
         </span>
         {/* Vertical "Group" label */}
         <span style={{
-          fontSize: 9,
+          fontSize: 11,
           color: 'var(--colour-text-faint)',
           textTransform: 'uppercase',
           letterSpacing: '0.1em',

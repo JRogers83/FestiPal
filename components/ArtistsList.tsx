@@ -146,7 +146,7 @@ export const ArtistsList = memo(function ArtistsList({
                     />
                   ))}
                   {othersSelected.length > 4 && (
-                    <span className="text-[9px]" style={{ color: 'var(--colour-text-muted)' }}>
+                    <span className="text-[11px]" style={{ color: 'var(--colour-text-muted)' }}>
                       +{othersSelected.length - 4}
                     </span>
                   )}
