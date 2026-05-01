@@ -13,9 +13,18 @@ export default async function SchedulePage({ params, searchParams }: Props) {
   const { day } = await searchParams
 
   const lineup = await getLineup()
-  // Default to first day that actually has acts scheduled
+  // Default to today's festival day if within festival dates, else first day with acts
+  const FESTIVAL_DAYS_BY_DATE: Record<string, string> = {
+    '2026-06-12': 'friday',
+    '2026-06-13': 'saturday',
+    '2026-06-14': 'sunday',
+  }
+  const todayDate = new Date().toISOString().slice(0, 10)
+  const todayFestivalDayId = FESTIVAL_DAYS_BY_DATE[todayDate]
   const daysWithActs = new Set(lineup.acts.map(a => a.festivalDayId))
-  const defaultDay = lineup.festivalDays.find(d => daysWithActs.has(d.id))?.id ?? 'friday'
+  const defaultDay = todayFestivalDayId && daysWithActs.has(todayFestivalDayId)
+    ? todayFestivalDayId
+    : lineup.festivalDays.find(d => daysWithActs.has(d.id))?.id ?? 'friday'
   const activeDay = day ?? defaultDay
 
   const rawUser = await getUserById(userId)
