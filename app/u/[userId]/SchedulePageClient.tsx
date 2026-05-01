@@ -6,6 +6,7 @@ import { useUser } from '@/lib/hooks/use-user'
 import { useToggleSelection } from '@/lib/hooks/use-selections'
 import { useConnections } from '@/lib/hooks/use-connections'
 import { detectClashes } from '@/lib/clash-detection'
+import { timeToMinutes } from '@/lib/time'
 import { Header } from '@/components/Header'
 import { DayTabs } from '@/components/DayTabs'
 import { ScheduleGrid } from '@/components/schedule/ScheduleGrid'
@@ -57,6 +58,27 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
     () => lineup.acts.filter(a => a.festivalDayId === activeDay),
     [lineup.acts, activeDay]
   )
+
+  const stageMap = useMemo(
+    () => new Map(lineup.stages.map(s => [s.id, s.name])),
+    [lineup.stages]
+  )
+
+  const planSummary = useMemo(() => {
+    const dayLabel = lineup.festivalDays.find(d => d.id === activeDay)?.label ?? activeDay
+    const mySelectedDayActs = dayActs
+      .filter(a => currentUser.selections.includes(a.id))
+      .sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime))
+    return {
+      actCount: currentUser.selections.length,
+      dayLabel,
+      nextActs: mySelectedDayActs.slice(0, 2).map(a => ({
+        name:  a.name,
+        time:  a.startTime.slice(0, 5),
+        stage: stageMap.get(a.stageId) ?? a.stageId,
+      })),
+    }
+  }, [dayActs, currentUser.selections, lineup.festivalDays, activeDay, stageMap])
 
   const checkedConnectedUsers: UserWithSelections[] = useMemo(
     () =>
@@ -166,6 +188,8 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
           currentUser={currentUser}
           checkedUserIds={checkedUserIds}
           onCheckChange={handleCheckChange}
+          planSummary={planSummary}
+          clashPairCount={clashPairs.length}
         />
       </div>
     </div>

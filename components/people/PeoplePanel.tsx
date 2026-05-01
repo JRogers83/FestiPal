@@ -3,69 +3,87 @@
 import { useState, useEffect } from 'react'
 import { PersonRow } from './PersonRow'
 import { useConnections, useRemoveConnection, useAddDirectConnection } from '@/lib/hooks/use-connections'
+import { useCreateInvite } from '@/lib/hooks/use-invite'
 import type { UserWithSelections } from '@/types'
+
+type PlanSummary = {
+  actCount: number
+  dayLabel: string
+  nextActs: { name: string; time: string; stage: string }[]
+}
 
 type Props = {
   userId: string
   currentUser: UserWithSelections
   checkedUserIds: Set<string>
   onCheckChange: (userId: string, checked: boolean) => void
+  planSummary: PlanSummary
+  clashPairCount: number
 }
 
-// Extract a userId or invite token from a pasted Festipals URL or raw UUID.
 function parseConnectionInput(input: string): { type: 'userId' | 'token'; value: string } | null {
   const s = input.trim()
   const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-
   const scheduleMatch = s.match(new RegExp(`/u/(${UUID})`, 'i'))
   if (scheduleMatch) return { type: 'userId', value: scheduleMatch[1] }
-
   const inviteMatch = s.match(new RegExp(`/invite/(${UUID})`, 'i'))
   if (inviteMatch) return { type: 'token', value: inviteMatch[1] }
-
-  // Bare UUID — treat as userId (schedule link)
   const rawMatch = s.match(new RegExp(`^(${UUID})$`, 'i'))
   if (rawMatch) return { type: 'userId', value: rawMatch[1] }
-
   return null
 }
 
-function copyToClipboard(text: string) {
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).catch(() => {})
-  }
-}
-
-export function PeoplePanel({ userId, currentUser, checkedUserIds, onCheckChange }: Props) {
-  const [open, setOpen] = useState(false)
-  const [managing, setManaging] = useState(false)
+export function PeoplePanel({ userId, currentUser, checkedUserIds, onCheckChange, planSummary, clashPairCount }: Props) {
+  const [open, setOpen]                 = useState(false)
+  const [isMobile, setIsMobile]         = useState(false)
   const [connectInput, setConnectInput] = useState('')
   const [connectFeedback, setConnectFeedback] = useState<{ ok: boolean; message: string } | null>(null)
-  const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [inviteResult, setInviteResult] = useState<{ url: string } | null>(null)
+  const [inviteCopied, setInviteCopied] = useState(false)
 
   useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
     setOpen(window.innerWidth >= 768)
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
   }, [])
 
   const { data: connections = [] } = useConnections(userId)
   const removeConnection = useRemoveConnection(userId)
-  const addDirect = useAddDirectConnection(userId)
+  const addDirect        = useAddDirectConnection(userId)
+  const createInvite     = useCreateInvite()
 
-  const myLink = typeof window !== 'undefined'
-    ? `${window.location.origin}/u/${userId}`
-    : `/u/${userId}`
-
-  function handleCopy(text: string, id: string) {
-    copyToClipboard(text)
-    setCopiedId(id)
-    setTimeout(() => setCopiedId(null), 2000)
+  async function handleShare() {
+    const url = await createInvite.mutateAsync(userId)
+    setInviteResult({ url })
+    if (navigator.share) {
+      navigator.share({ title: 'Festipals — Download 2026', url }).catch(() => {})
+    }
   }
 
-  async function handleShare(text: string) {
+  function handleCopyInvite() {
+    if (!inviteResult) return
+    navigator.clipboard.writeText(inviteResult.url).catch(() => {})
+    setInviteCopied(true)
+    setTimeout(() => setInviteCopied(false), 2000)
+  }
+
+  function handleCopyBookmark() {
+    const url = `${window.location.origin}/u/${userId}`
     if (navigator.share) {
-      await navigator.share({ title: 'Festipals', url: text }).catch(() => {})
+      navigator.share({ title: 'Festipals', url }).catch(() => {})
     } else {
-      handleCopy(text, 'mylink')
+      navigator.clipboard.writeText(url).catch(() => {})
+    }
+  }
+
+  function handleCopyMemberLink(memberId: string) {
+    const url = `${window.location.origin}/u/${memberId}`
+    if (navigator.share) {
+      navigator.share({ title: 'Festipals', url }).catch(() => {})
+    } else {
+      navigator.clipboard.writeText(url).catch(() => {})
     }
   }
 
@@ -73,7 +91,7 @@ export function PeoplePanel({ userId, currentUser, checkedUserIds, onCheckChange
     setConnectFeedback(null)
     const parsed = parseConnectionInput(connectInput)
     if (!parsed) {
-      setConnectFeedback({ ok: false, message: 'Paste a Festipals schedule link (/u/...) or invite link (/invite/...).' })
+      setConnectFeedback({ ok: false, message: 'Paste a Festipals link (/u/… or /invite/…).' })
       return
     }
     try {
@@ -87,266 +105,239 @@ export function PeoplePanel({ userId, currentUser, checkedUserIds, onCheckChange
     }
   }
 
+  const panelContent = (
+    <div style={{ width: isMobile ? '100%' : 256, display: 'flex', flexDirection: 'column', height: '100%' }}>
+
+      {/* YOUR PLAN */}
+      <div style={{ padding: '10px 14px 8px', borderBottom: '1px solid var(--colour-border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+          <span className="text-xs uppercase tracking-wide" style={{ color: 'var(--colour-text-muted)' }}>Your Plan</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 9, height: 9, borderRadius: '50%', backgroundColor: currentUser.colour }} />
+            <span className="text-xs" style={{ color: 'var(--colour-text)' }}>{currentUser.nickname}</span>
+          </div>
+        </div>
+        <div className="text-xs" style={{ color: 'var(--colour-text-muted)', marginBottom: 6 }}>
+          {planSummary.actCount} act{planSummary.actCount !== 1 ? 's' : ''} · {planSummary.dayLabel.split(' ')[0]}
+        </div>
+        {planSummary.nextActs.length > 0 && (
+          <>
+            <div className="text-xs uppercase tracking-wide" style={{ color: 'var(--colour-text-faint)', marginBottom: 3 }}>Next</div>
+            {planSummary.nextActs.map((a, i) => (
+              <div key={i} className="text-xs" style={{ padding: '2px 0', color: 'var(--colour-text)' }}>
+                {a.name}
+                <span style={{ color: 'var(--colour-text-muted)', marginLeft: 6 }}>{a.time} · {a.stage}</span>
+              </div>
+            ))}
+          </>
+        )}
+      </div>
+
+      {/* SHARE CTAs */}
+      <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--colour-border)', display: 'flex', flexDirection: 'column', gap: 5 }}>
+        {inviteResult ? (
+          <div style={{ background: 'var(--colour-surface-2)', border: '1px solid var(--colour-border)', borderRadius: 3, padding: 10 }}>
+            <div style={{ display: 'flex', gap: 5, marginBottom: 6 }}>
+              <div style={{ flex: 1, fontSize: 10, color: 'var(--colour-text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {inviteResult.url}
+              </div>
+              <button
+                onClick={handleCopyInvite}
+                style={{ background: inviteCopied ? '#22c55e' : 'var(--colour-primary)', color: '#fff', border: 'none', borderRadius: 2, fontSize: 9, padding: '3px 7px', cursor: 'pointer', flexShrink: 0 }}
+              >
+                {inviteCopied ? '✓' : 'Copy'}
+              </button>
+              <button
+                onClick={() => setInviteResult(null)}
+                style={{ background: 'none', border: 'none', color: 'var(--colour-text-faint)', cursor: 'pointer', fontSize: 12, lineHeight: 1 }}
+              >×</button>
+            </div>
+            <p style={{ fontSize: 9, color: 'var(--colour-text-faint)', margin: 0 }}>Anyone with this link can join. Expires 21 Jun.</p>
+          </div>
+        ) : (
+          <button
+            onClick={handleShare}
+            disabled={createInvite.isPending}
+            className="w-full text-xs py-2 uppercase tracking-wide font-medium"
+            style={{ backgroundColor: 'var(--colour-primary)', color: '#fff', border: 'none', borderRadius: 3, cursor: 'pointer', opacity: createInvite.isPending ? 0.6 : 1 }}
+          >
+            Share with friends
+          </button>
+        )}
+        <button
+          onClick={handleCopyBookmark}
+          className="w-full text-xs py-1.5"
+          style={{ backgroundColor: 'transparent', color: 'var(--colour-text-muted)', border: '1px solid var(--colour-border)', borderRadius: 3, cursor: 'pointer' }}
+          title="Your private schedule link — save it to come back later"
+        >
+          Copy your bookmark URL
+        </button>
+      </div>
+
+      {/* GROUP */}
+      <div style={{ padding: '8px 14px', flex: 1, overflowY: 'auto' }}>
+        <div className="text-xs uppercase tracking-wide mb-1" style={{ color: 'var(--colour-text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span>Group <span style={{ fontWeight: 'normal', textTransform: 'none', letterSpacing: 0, color: 'var(--colour-text-faint)' }}>({connections.length})</span></span>
+          {clashPairCount > 0 && (
+            <span style={{ fontWeight: 'normal', textTransform: 'none', letterSpacing: 0, color: 'var(--colour-primary)' }}>
+              {clashPairCount} clash{clashPairCount !== 1 ? 'es' : ''}
+            </span>
+          )}
+        </div>
+
+        <PersonRow
+          userId={userId}
+          nickname={currentUser.nickname}
+          colour={currentUser.colour}
+          checked={checkedUserIds.has(userId)}
+          isCurrentUser={true}
+          onCheckChange={checked => onCheckChange(userId, checked)}
+        />
+
+        {connections.map(conn => (
+          <PersonRow
+            key={conn.connectionId}
+            userId={conn.user.id}
+            nickname={conn.user.nickname}
+            colour={conn.user.colour}
+            checked={checkedUserIds.has(conn.user.id)}
+            isCurrentUser={false}
+            onCheckChange={checked => onCheckChange(conn.user.id, checked)}
+            onRemove={() => removeConnection.mutate(conn.connectionId)}
+            onCopyLink={() => handleCopyMemberLink(conn.user.id)}
+          />
+        ))}
+
+        {connections.length === 0 && (
+          <p className="text-xs py-1" style={{ color: 'var(--colour-text-faint)' }}>
+            No friends yet — share the link above!
+          </p>
+        )}
+
+        {/* Inline connect-by-paste */}
+        <div style={{ marginTop: 10 }}>
+          <input
+            type="url"
+            placeholder="Paste a friend's link to connect…"
+            value={connectInput}
+            onChange={e => { setConnectInput(e.target.value); setConnectFeedback(null) }}
+            onKeyDown={e => { if (e.key === 'Enter') handleConnect() }}
+            className="w-full text-xs px-2 py-2"
+            style={{ backgroundColor: 'var(--colour-surface-2)', border: '1px solid var(--colour-border)', borderRadius: 3, color: 'var(--colour-text)', outline: 'none', fontFamily: 'inherit' }}
+          />
+          {connectInput.trim() && (
+            <button
+              onClick={handleConnect}
+              disabled={addDirect.isPending}
+              className="w-full text-xs py-1.5 mt-1 uppercase tracking-wide"
+              style={{ backgroundColor: 'var(--colour-primary)', color: '#fff', border: 'none', borderRadius: 3, cursor: 'pointer', opacity: addDirect.isPending ? 0.6 : 1 }}
+            >
+              {addDirect.isPending ? 'Connecting…' : 'Connect'}
+            </button>
+          )}
+          {connectFeedback && (
+            <p className="text-xs mt-1" style={{ color: connectFeedback.ok ? '#22c55e' : 'var(--colour-primary)', lineHeight: 1.5 }}>
+              {connectFeedback.message}
+            </p>
+          )}
+        </div>
+      </div>
+
+    </div>
+  )
+
+  if (isMobile) {
+    return (
+      <>
+        {/* Edge handle — only when closed */}
+        {!open && (
+          <button
+            onClick={() => setOpen(true)}
+            aria-label="Open group panel"
+            style={{
+              position: 'fixed', right: 0, top: '50%', transform: 'translateY(-50%)',
+              zIndex: 20, width: 36, height: 96,
+              borderRadius: '10px 0 0 10px',
+              backgroundColor: 'var(--colour-surface)',
+              border: '1px solid var(--colour-border)', borderRight: 'none',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer',
+            }}
+          >
+            <span style={{ fontSize: 22, color: 'var(--colour-primary)', lineHeight: 1, userSelect: 'none' }}>‹</span>
+            <span style={{ fontSize: 13, color: 'var(--colour-primary)', textTransform: 'uppercase', letterSpacing: '0.1em', writingMode: 'vertical-rl', userSelect: 'none' }}>Group</span>
+          </button>
+        )}
+
+        {/* Bottom sheet */}
+        {open && (
+          <>
+            <div
+              onClick={() => setOpen(false)}
+              style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 49 }}
+            />
+            <div
+              style={{
+                position: 'fixed', bottom: 0, left: 0, right: 0,
+                maxHeight: '70vh', zIndex: 50,
+                backgroundColor: 'var(--colour-surface)',
+                borderRadius: '12px 12px 0 0',
+                borderTop: '1px solid var(--colour-border)',
+                display: 'flex', flexDirection: 'column',
+                overflowY: 'auto',
+              }}
+            >
+              {/* Drag handle */}
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px' }}>
+                <div style={{ width: 36, height: 4, backgroundColor: 'var(--colour-border)', borderRadius: 2 }} />
+              </div>
+              {panelContent}
+            </div>
+          </>
+        )}
+      </>
+    )
+  }
+
+  // Desktop: right-side sliding panel
   return (
     <div style={{ position: 'relative', flexShrink: 0, display: 'flex' }}>
+      {!open && (
+        <button
+          onClick={() => setOpen(true)}
+          aria-label="Open group panel"
+          style={{
+            position: 'absolute', left: 0, top: '50%', transform: 'translateX(-100%) translateY(-50%)',
+            zIndex: 20, width: 36, height: 96,
+            borderRadius: '10px 0 0 10px',
+            backgroundColor: 'var(--colour-surface)',
+            border: '1px solid var(--colour-border)', borderRight: 'none',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer',
+          }}
+        >
+          <span style={{ fontSize: 22, color: 'var(--colour-primary)', lineHeight: 1, userSelect: 'none' }}>‹</span>
+          <span style={{ fontSize: 13, color: 'var(--colour-primary)', textTransform: 'uppercase', letterSpacing: '0.1em', writingMode: 'vertical-rl', userSelect: 'none' }}>Group</span>
+        </button>
+      )}
+      {open && (
+        <button
+          onClick={() => setOpen(false)}
+          aria-label="Close group panel"
+          style={{
+            position: 'absolute', left: 0, top: '50%', transform: 'translateX(-100%) translateY(-50%)',
+            zIndex: 20, width: 36, height: 96,
+            borderRadius: '10px 0 0 10px',
+            backgroundColor: 'var(--colour-surface)',
+            border: '1px solid var(--colour-border)', borderRight: 'none',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer',
+          }}
+        >
+          <span style={{ fontSize: 22, color: 'var(--colour-primary)', lineHeight: 1, userSelect: 'none' }}>›</span>
+          <span style={{ fontSize: 13, color: 'var(--colour-primary)', textTransform: 'uppercase', letterSpacing: '0.1em', writingMode: 'vertical-rl', userSelect: 'none' }}>Group</span>
+        </button>
+      )}
 
-      {/* Edge handle */}
-      <button
-        onClick={() => setOpen(o => !o)}
-        aria-label={open ? 'Close group panel' : 'Open group panel'}
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: '50%',
-          transform: 'translateX(-100%) translateY(-50%)',
-          zIndex: 20,
-          width: 36,
-          height: 96,
-          borderRadius: '10px 0 0 10px',
-          backgroundColor: 'var(--colour-surface)',
-          border: '1px solid var(--colour-border)',
-          borderRight: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          gap: 6,
-        }}
-      >
-        <span style={{ fontSize: 22, color: 'var(--colour-primary)', lineHeight: 1, userSelect: 'none' }}>
-          {open ? '›' : '‹'}
-        </span>
-        <span style={{
-          fontSize: 13,
-          color: 'var(--colour-primary)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          writingMode: 'vertical-rl',
-          textOrientation: 'mixed',
-          userSelect: 'none',
-        }}>
-          Group
-        </span>
-      </button>
-
-      {/* Panel content */}
-      <aside style={{
-        width: open ? 256 : 0,
-        overflow: 'hidden',
-        transition: 'width 0.2s ease',
-        backgroundColor: 'var(--colour-surface)',
-        borderLeft: open ? '1px solid var(--colour-border)' : 'none',
-        flexShrink: 0,
-      }}>
-        <div style={{ width: 256, display: 'flex', flexDirection: 'column', height: '100%' }}>
-
-          {managing ? (
-            /* ── Manage view ── */
-            <>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '10px 16px',
-                borderBottom: '1px solid var(--colour-border)',
-              }}>
-                <button
-                  onClick={() => { setManaging(false); setConnectFeedback(null); setConnectInput('') }}
-                  style={{ color: 'var(--colour-primary)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: 0 }}
-                  aria-label="Back to group"
-                >
-                  ‹
-                </button>
-                <span className="text-sm font-medium uppercase tracking-wide" style={{ color: 'var(--colour-text-muted)' }}>
-                  Manage
-                </span>
-              </div>
-
-              <div style={{ overflowY: 'auto', flex: 1, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-
-                {/* Your link */}
-                <section>
-                  <p className="text-xs uppercase tracking-wide mb-1" style={{ color: 'var(--colour-text-muted)' }}>
-                    Your link
-                  </p>
-                  <p className="text-xs mb-2" style={{ color: 'var(--colour-text-faint)', lineHeight: 1.5 }}>
-                    Share this so a friend can connect with your existing profile.
-                  </p>
-                  <button
-                    onClick={() => handleShare(myLink)}
-                    className="w-full text-xs py-2 uppercase tracking-wide font-medium"
-                    style={{
-                      backgroundColor: 'var(--colour-primary)',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: 3,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {copiedId === 'mylink' ? '✓ Copied' : '⎘ Share / copy my link'}
-                  </button>
-                </section>
-
-                <div style={{ borderTop: '1px solid var(--colour-border)' }} />
-
-                {/* Connect a friend */}
-                <section>
-                  <p className="text-xs uppercase tracking-wide mb-1" style={{ color: 'var(--colour-text-muted)' }}>
-                    Connect a friend
-                  </p>
-                  <p className="text-xs mb-2" style={{ color: 'var(--colour-text-faint)', lineHeight: 1.5 }}>
-                    Paste their Festipals link (<code style={{ color: 'var(--colour-text-faint)' }}>/u/…</code>) or an invite link (<code style={{ color: 'var(--colour-text-faint)' }}>/invite/…</code>).
-                  </p>
-                  <input
-                    type="url"
-                    placeholder="https://festipals.live/u/…"
-                    value={connectInput}
-                    onChange={e => { setConnectInput(e.target.value); setConnectFeedback(null) }}
-                    onKeyDown={e => { if (e.key === 'Enter') handleConnect() }}
-                    className="w-full text-xs px-2 py-2 mb-2"
-                    style={{
-                      backgroundColor: 'var(--colour-surface-2)',
-                      border: '1px solid var(--colour-border)',
-                      borderRadius: 3,
-                      color: 'var(--colour-text)',
-                      outline: 'none',
-                      fontFamily: 'inherit',
-                    }}
-                  />
-                  <button
-                    onClick={handleConnect}
-                    disabled={addDirect.isPending || !connectInput.trim()}
-                    className="w-full text-xs py-2 uppercase tracking-wide font-medium"
-                    style={{
-                      backgroundColor: 'var(--colour-primary)',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: 3,
-                      cursor: addDirect.isPending || !connectInput.trim() ? 'default' : 'pointer',
-                      opacity: addDirect.isPending || !connectInput.trim() ? 0.5 : 1,
-                    }}
-                  >
-                    {addDirect.isPending ? 'Connecting…' : 'Connect'}
-                  </button>
-                  {connectFeedback && (
-                    <p
-                      className="text-xs mt-2"
-                      style={{ color: connectFeedback.ok ? '#22c55e' : 'var(--colour-primary)', lineHeight: 1.5 }}
-                    >
-                      {connectFeedback.message}
-                    </p>
-                  )}
-                </section>
-
-                {connections.length > 0 && (
-                  <>
-                    <div style={{ borderTop: '1px solid var(--colour-border)' }} />
-
-                    {/* Group members' links */}
-                    <section>
-                      <p className="text-xs uppercase tracking-wide mb-1" style={{ color: 'var(--colour-text-muted)' }}>
-                        Group members' links
-                      </p>
-                      <p className="text-xs mb-2" style={{ color: 'var(--colour-text-faint)', lineHeight: 1.5 }}>
-                        Send someone their link if they've lost it.
-                      </p>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        {connections.map(conn => {
-                          const link = `${typeof window !== 'undefined' ? window.location.origin : ''}/u/${conn.user.id}`
-                          const cid = `member-${conn.user.id}`
-                          return (
-                            <div key={conn.user.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                              <span
-                                style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: conn.user.colour, flexShrink: 0 }}
-                              />
-                              <span className="text-xs flex-1 truncate" style={{ color: 'var(--colour-text)' }}>
-                                {conn.user.nickname}
-                              </span>
-                              <button
-                                onClick={() => handleCopy(link, cid)}
-                                className="text-xs px-2 py-1"
-                                style={{
-                                  backgroundColor: 'var(--colour-surface-2)',
-                                  border: '1px solid var(--colour-border)',
-                                  borderRadius: 3,
-                                  color: copiedId === cid ? '#22c55e' : 'var(--colour-text-muted)',
-                                  cursor: 'pointer',
-                                  flexShrink: 0,
-                                  whiteSpace: 'nowrap',
-                                }}
-                              >
-                                {copiedId === cid ? '✓' : '⎘'}
-                              </button>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </section>
-                  </>
-                )}
-              </div>
-            </>
-          ) : (
-            /* ── Group view ── */
-            <>
-              <div
-                className="px-4 py-3 text-sm font-medium uppercase tracking-wide"
-                style={{ color: 'var(--colour-text-muted)', borderBottom: '1px solid var(--colour-border)' }}
-              >
-                Your Group
-              </div>
-
-              <div className="px-4 py-2" style={{ flex: 1 }}>
-                <PersonRow
-                  userId={userId}
-                  nickname={currentUser.nickname}
-                  colour={currentUser.colour}
-                  checked={checkedUserIds.has(userId)}
-                  isCurrentUser={true}
-                  onCheckChange={checked => onCheckChange(userId, checked)}
-                />
-
-                {connections.map(conn => (
-                  <PersonRow
-                    key={conn.connectionId}
-                    userId={conn.user.id}
-                    nickname={conn.user.nickname}
-                    colour={conn.user.colour}
-                    checked={checkedUserIds.has(conn.user.id)}
-                    isCurrentUser={false}
-                    onCheckChange={checked => onCheckChange(conn.user.id, checked)}
-                    onRemove={() => removeConnection.mutate(conn.connectionId)}
-                  />
-                ))}
-
-                {connections.length === 0 && (
-                  <p className="text-xs py-2" style={{ color: 'var(--colour-text-faint)' }}>
-                    No friends linked yet. Invite someone!
-                  </p>
-                )}
-              </div>
-
-              {/* Manage button */}
-              <div style={{ padding: '8px 16px 12px', borderTop: '1px solid var(--colour-border)' }}>
-                <button
-                  onClick={() => setManaging(true)}
-                  className="w-full text-xs py-2 uppercase tracking-wide"
-                  style={{
-                    backgroundColor: 'var(--colour-surface-2)',
-                    color: 'var(--colour-text-muted)',
-                    border: '1px solid var(--colour-border)',
-                    borderRadius: 3,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Manage
-                </button>
-              </div>
-            </>
-          )}
-
-        </div>
+      <aside style={{ width: open ? 256 : 0, overflow: 'hidden', transition: 'width 0.2s ease', backgroundColor: 'var(--colour-surface)', borderLeft: open ? '1px solid var(--colour-border)' : 'none', flexShrink: 0 }}>
+        {panelContent}
       </aside>
     </div>
   )
