@@ -128,7 +128,7 @@ export function ScheduleGrid({
                 const isSelected = currentUserSelections.includes(act.id)
                 const selectedByOthers = checkedUsers
                   .filter(u => u.id !== currentUserId && u.selections.includes(act.id))
-                  .map(u => ({ userId: u.id, colour: u.colour }))
+                  .map(u => ({ userId: u.id, colour: u.colour, nickname: u.nickname }))
 
                 return (
                   <ActCard

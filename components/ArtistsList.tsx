@@ -238,17 +238,19 @@ export const ArtistsList = memo(function ArtistsList({
                 {othersSelected.length > 0 && (
                   <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
                     {othersSelected.slice(0, 4).map(u => (
-                      <span
+                      <div
                         key={u.id}
                         title={u.nickname}
                         style={{
-                          width: 9,
-                          height: 9,
-                          borderRadius: '50%',
+                          width: 18, height: 18, borderRadius: 10,
                           backgroundColor: u.colour,
-                          display: 'inline-block',
+                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 9, fontWeight: 700, color: '#fff',
+                          flexShrink: 0,
                         }}
-                      />
+                      >
+                        {u.nickname.charAt(0).toUpperCase()}
+                      </div>
                     ))}
                     {othersSelected.length > 4 && (
                       <span className="text-[11px]" style={{ color: 'var(--colour-text-muted)' }}>

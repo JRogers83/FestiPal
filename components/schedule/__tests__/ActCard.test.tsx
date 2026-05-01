@@ -48,8 +48,8 @@ describe('ActCard', () => {
     const props = {
       ...defaultProps,
       selectedByOthers: [
-        { userId: 'u1', colour: '#22c55e' },
-        { userId: 'u2', colour: '#ec4899' },
+        { userId: 'u1', colour: '#22c55e', nickname: 'Alice' },
+        { userId: 'u2', colour: '#ec4899', nickname: 'Bob' },
       ],
     }
     render(<ActCard {...props} />)
