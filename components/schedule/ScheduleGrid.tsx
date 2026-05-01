@@ -51,23 +51,24 @@ export function ScheduleGrid({
     return map
   }, [acts, stages])
 
+  // Mark BOTH acts in every clash pair (not just the current user's side)
   const clashingActIds = useMemo(() => {
     const set = new Set<string>()
     for (const cp of clashPairs) {
-      if (cp.personA.userId === currentUserId) set.add(cp.personA.act.id)
-      if (cp.personB.userId === currentUserId) set.add(cp.personB.act.id)
+      set.add(cp.personA.act.id)
+      set.add(cp.personB.act.id)
     }
     return set
-  }, [clashPairs, currentUserId])
+  }, [clashPairs])
 
   const clashColourMap = useMemo(() => {
     const map = new Map<string, string>()
     for (const cp of clashPairs) {
-      if (cp.personA.userId === currentUserId) map.set(cp.personA.act.id, cp.personB.colour)
-      if (cp.personB.userId === currentUserId) map.set(cp.personB.act.id, cp.personA.colour)
+      map.set(cp.personA.act.id, cp.personB.colour)
+      map.set(cp.personB.act.id, cp.personA.colour)
     }
     return map
-  }, [clashPairs, currentUserId])
+  }, [clashPairs])
 
   if (acts.length === 0) {
     return (
@@ -86,7 +87,7 @@ export function ScheduleGrid({
         <TimeAxis timeSlots={timeSlots} gridHeight={gridHeight} />
 
         {stages.map(stage => (
-          <div key={stage.id} className="flex flex-col" style={{ minWidth: 140 }}>
+          <div key={stage.id} className="flex flex-col" style={{ flex: '1 1 0', minWidth: 140, maxWidth: 280 }}>
             <div
               className="sticky top-0 z-10 h-10 flex items-center justify-center px-2
                          border-b-2 text-xs font-medium uppercase tracking-wide truncate"
