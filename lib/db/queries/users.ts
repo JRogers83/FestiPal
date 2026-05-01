@@ -12,13 +12,13 @@ export async function createUser(id: string) {
 }
 
 export async function getUserById(id: string) {
-  const [user] = await db.select().from(users).where(eq(users.id, id))
+  const [rows, selectionRows] = await Promise.all([
+    db.select().from(users).where(eq(users.id, id)),
+    db.select({ actId: selections.actId }).from(selections).where(eq(selections.userId, id)),
+  ])
+  const user = rows[0]
   if (!user) return null
-  const userSelections = await db
-    .select({ actId: selections.actId })
-    .from(selections)
-    .where(eq(selections.userId, id))
-  return { ...user, selections: userSelections.map(s => s.actId) }
+  return { ...user, selections: selectionRows.map(s => s.actId) }
 }
 
 export async function updateUser(id: string, data: { nickname?: string; colour?: string }) {
