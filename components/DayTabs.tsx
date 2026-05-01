@@ -32,7 +32,7 @@ export function DayTabs({ days, activeDay, userId }: Props) {
                 marginBottom: -1,
               }}
             >
-              {day.label.split(' ')[0]}
+              <span style={{ fontSize: 'clamp(0.7rem, 2.2vw, 0.875rem)' }}>{day.label}</span>
             </button>
           )
         })}
