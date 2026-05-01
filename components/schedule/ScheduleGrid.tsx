@@ -81,6 +81,7 @@ export function ScheduleGrid({
   return (
     <div
       className="overflow-x-auto overflow-y-hidden"
+      data-no-swipe-days="true"
       style={{ overscrollBehaviorX: 'contain' }}
     >
       <div className="flex min-w-max">

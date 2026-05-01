@@ -109,10 +109,13 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
     toggleSelection.mutate({ actId, selected: isSelected })
   }, [toggleSelection])
 
-  const touchStartX = useRef(0)
-  const touchStartY = useRef(0)
+  const touchStartX  = useRef(0)
+  const touchStartY  = useRef(0)
+  const touchInGrid  = useRef(false)
 
   const handleSwipe = useCallback((e: React.TouchEvent) => {
+    // Don't change day if the gesture started inside the horizontal grid scroller
+    if (touchInGrid.current) return
     const dx = e.changedTouches[0].clientX - touchStartX.current
     const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current)
     if (Math.abs(dx) <= 60 || dy > 30) return
@@ -177,7 +180,11 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
         <main
           className="flex-1 overflow-auto"
           style={{ padding: view === 'schedule' ? 8 : 0 }}
-          onTouchStart={e => { touchStartX.current = e.touches[0].clientX; touchStartY.current = e.touches[0].clientY }}
+          onTouchStart={e => {
+            touchStartX.current = e.touches[0].clientX
+            touchStartY.current = e.touches[0].clientY
+            touchInGrid.current = !!(e.target as Element).closest?.('[data-no-swipe-days]')
+          }}
           onTouchEnd={handleSwipe}
         >
           {view === 'schedule' ? (
