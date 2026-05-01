@@ -9,7 +9,6 @@ import { detectClashes } from '@/lib/clash-detection'
 import { Header } from '@/components/Header'
 import { DayTabs } from '@/components/DayTabs'
 import { ScheduleGrid } from '@/components/schedule/ScheduleGrid'
-import { ClashBanner } from '@/components/schedule/ClashBanner'
 import { PeoplePanel } from '@/components/people/PeoplePanel'
 import { ArtistsList } from '@/components/ArtistsList'
 
@@ -135,7 +134,6 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
           className="flex-1 overflow-auto"
           style={{ padding: view === 'schedule' ? 8 : 0 }}
         >
-          <ClashBanner clashPairs={clashPairs} />
           {view === 'schedule' ? (
             <ScheduleGrid
               acts={dayActs}
