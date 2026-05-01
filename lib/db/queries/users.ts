@@ -29,3 +29,12 @@ export async function updateUser(id: string, data: { nickname?: string; colour?:
     .returning()
   return user ?? null
 }
+
+export async function createUserWithColour(id: string, colour: string) {
+  const [user] = await db
+    .insert(users)
+    .values({ id, colour })
+    .onConflictDoNothing()
+    .returning()
+  return user ?? null
+}

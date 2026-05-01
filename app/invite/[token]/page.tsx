@@ -1,7 +1,10 @@
 import { redirect } from 'next/navigation'
 import { randomUUID } from 'crypto'
 import { getInviteByToken, redeemInvite } from '@/lib/db/queries/invites'
-import { createUser, getUserById } from '@/lib/db/queries/users'
+import { createUserWithColour, getUserById } from '@/lib/db/queries/users'
+import { getConnectionsForUser } from '@/lib/db/queries/connections'
+import { USER_COLOURS } from '@/constants/colours'
+import { createDirectConnection } from '@/lib/db/queries/connections'
 
 type Props = {
   params: Promise<{ token: string }>
@@ -42,7 +45,17 @@ export default async function InvitePage({ params, searchParams }: Props) {
   async function accept() {
     'use server'
     const visitorId = randomUUID()
-    await createUser(visitorId)
+
+    // Read existing group colours so the new user gets a distinct one
+    const groupConnections = await getConnectionsForUser(invite.createdBy)
+    const inviter = await getUserById(invite.createdBy)
+    const usedColours = new Set([
+      inviter?.colour,
+      ...groupConnections.map(c => c.user.colour),
+    ].filter(Boolean) as string[])
+    const assignedColour = USER_COLOURS.find(c => !usedColours.has(c.hex))?.hex ?? '#3b82f6'
+
+    await createUserWithColour(visitorId, assignedColour)
     const result = await redeemInvite(token, visitorId)
     if (!result.success) {
       redirect(`/invite/${token}?error=${result.reason}`)
