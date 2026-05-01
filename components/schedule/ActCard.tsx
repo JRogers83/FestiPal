@@ -49,6 +49,7 @@ export const ActCard = memo(function ActCard({
         border: '1px solid var(--colour-border)',
         boxShadow: isClashing && clashColour ? `inset 0 0 0 3px ${clashColour}` : undefined,
         borderRadius: 4,
+        borderTop: act.headliner ? '2px solid var(--colour-primary)' : undefined,
         padding: '4px 6px',
         textAlign: 'left',
         cursor: 'pointer',
@@ -73,9 +74,9 @@ export const ActCard = memo(function ActCard({
       <div>
         <p
           className="text-xs font-medium leading-tight"
-          style={{ color: isSelected ? '#fff' : 'var(--colour-text)' }}
+          style={{ color: isSelected ? '#fff' : 'var(--colour-text)', fontWeight: act.headliner ? 700 : 400 }}
         >
-          {act.headliner ? <strong>{act.name}</strong> : act.name}
+          {act.name}
         </p>
         <p className="text-xs" style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : 'var(--colour-text-muted)' }}>
           {act.startTime.slice(0, 5)}
