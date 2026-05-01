@@ -19,7 +19,7 @@ function rateLimit(key: string, limit: number, windowMs: number): boolean {
 
 export function middleware(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
-  const { pathname } = request
+  const { pathname } = request.nextUrl
 
   if (request.method !== 'POST') return NextResponse.next()
 
