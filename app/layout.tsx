@@ -4,6 +4,7 @@ import { Providers } from '@/lib/providers/query-client'
 import { Analytics } from '@vercel/analytics/next'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://festipals.live'),
   title: 'Festipals — Download 2026',
   description: 'Build your Download Festival schedule, share it with friends, see who clashes.',
   openGraph: {
