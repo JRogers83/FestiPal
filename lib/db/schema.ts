@@ -23,6 +23,7 @@ export const stages = pgTable('stages', {
   id:      text('id').primaryKey(),
   name:    text('name').notNull(),
   ordinal: smallint('ordinal').notNull(),
+  zone:    text('zone').notNull().default('arena'),
 })
 
 export const acts = pgTable('acts', {

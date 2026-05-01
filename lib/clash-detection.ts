@@ -1,14 +1,14 @@
-import { timeToMinutes, adjustedEndMinutes, formatTime } from './time'
+import { festivalMinutes, festivalAdjustedEndMinutes, formatTime } from './time'
 import type { Act, UserWithSelections, ClashPair } from '@/types'
 
 function actsOverlap(a: Act, b: Act): boolean {
   if (a.festivalDayId !== b.festivalDayId) return false
   if (a.stageId === b.stageId) return false
 
-  const aStart = timeToMinutes(a.startTime)
-  const aEnd   = adjustedEndMinutes(a.startTime, a.endTime)
-  const bStart = timeToMinutes(b.startTime)
-  const bEnd   = adjustedEndMinutes(b.startTime, b.endTime)
+  const aStart = festivalMinutes(a.startTime)
+  const aEnd   = festivalAdjustedEndMinutes(a.startTime, a.endTime)
+  const bStart = festivalMinutes(b.startTime)
+  const bEnd   = festivalAdjustedEndMinutes(b.startTime, b.endTime)
 
   return aStart < bEnd && aEnd > bStart
 }
@@ -28,7 +28,7 @@ export function detectClashes(users: UserWithSelections[], acts: Act[]): ClashPa
           const actB = actMap.get(idB)
           if (!actA || !actB) continue
           if (actsOverlap(actA, actB)) {
-            const overlapStartRaw = timeToMinutes(actA.startTime) > timeToMinutes(actB.startTime)
+            const overlapStartRaw = festivalMinutes(actA.startTime) > festivalMinutes(actB.startTime)
               ? actA.startTime
               : actB.startTime
             clashes.push({

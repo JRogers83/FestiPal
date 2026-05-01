@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import type { Act, Stage, UserWithSelections, ClashPair } from '@/types'
-import { dayBounds, timeToMinutes, adjustedEndMinutes, minutesToPx } from '@/lib/time'
+import { dayBounds, festivalMinutes, festivalAdjustedEndMinutes, minutesToPx } from '@/lib/time'
 import { ActCard } from './ActCard'
 import { TimeAxis } from './TimeAxis'
 
@@ -122,8 +122,8 @@ export function ScheduleGrid({
                 ))}
 
               {(actsByStage.get(stage.id) ?? []).map(act => {
-                const startMins  = timeToMinutes(act.startTime)
-                const endMins    = adjustedEndMinutes(act.startTime, act.endTime)
+                const startMins  = festivalMinutes(act.startTime)
+                const endMins    = festivalAdjustedEndMinutes(act.startTime, act.endTime)
                 const top        = minutesToPx(startMins - bounds.startMinutes)
                 const height     = minutesToPx(endMins - startMins)
                 const isSelected = currentUserSelections.includes(act.id)

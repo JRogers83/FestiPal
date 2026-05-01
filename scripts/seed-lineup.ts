@@ -26,7 +26,7 @@ async function seed() {
   await db
     .insert(stages)
     .values(lineup.stages)
-    .onConflictDoUpdate({ target: stages.id, set: { name: stages.name, ordinal: stages.ordinal } })
+    .onConflictDoUpdate({ target: stages.id, set: { name: stages.name, ordinal: stages.ordinal, zone: stages.zone } })
 
   console.log('Seeding acts...')
   for (const act of lineup.acts) {

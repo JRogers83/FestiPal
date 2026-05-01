@@ -43,6 +43,8 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
     return window.innerWidth < 768 ? 'artists' : 'schedule'
   })
 
+  const [zoneFilter, setZoneFilter] = useState<'arena' | 'district-x' | 'both'>('both')
+
   // Track IDs the user has explicitly unchecked. Everyone else (self + all
   // connections) is checked by default, including newly joined members.
   const [uncheckedIds, setUncheckedIds] = useState<Set<string>>(new Set())
@@ -64,6 +66,33 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
   const dayActs = useMemo(
     () => lineup.acts.filter(a => a.festivalDayId === activeDay),
     [lineup.acts, activeDay]
+  )
+
+  const displayedStages = useMemo(
+    () => zoneFilter === 'both'
+      ? lineup.stages
+      : lineup.stages.filter(s => s.zone === zoneFilter),
+    [lineup.stages, zoneFilter]
+  )
+
+  const displayedDayActs = useMemo(
+    () => zoneFilter === 'both'
+      ? dayActs
+      : dayActs.filter(a => {
+          const stage = lineup.stages.find(s => s.id === a.stageId)
+          return stage?.zone === zoneFilter
+        }),
+    [dayActs, zoneFilter, lineup.stages]
+  )
+
+  const displayedAllActs = useMemo(
+    () => zoneFilter === 'both'
+      ? lineup.acts
+      : lineup.acts.filter(a => {
+          const stage = lineup.stages.find(s => s.id === a.stageId)
+          return stage?.zone === zoneFilter
+        }),
+    [lineup.acts, zoneFilter, lineup.stages]
   )
 
   const stageMap = useMemo(
@@ -135,9 +164,34 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
         colour={currentUser.colour}
       />
 
-      {/* Tab bar: day tabs + schedule/artists view toggle */}
+      {/* Tab bar: day tabs + zone filter + schedule/artists view toggle */}
       <div style={{ display: 'flex', alignItems: 'stretch', borderBottom: '1px solid var(--colour-border)', overflow: 'hidden' }}>
         <DayTabs days={lineup.festivalDays} activeDay={activeDay} userId={userId} />
+
+        {/* Zone filter */}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '0 6px', gap: 3, flexShrink: 0, borderRight: '1px solid var(--colour-border)' }}>
+          {(['both', 'arena', 'district-x'] as const).map(z => (
+            <button
+              key={z}
+              onClick={() => setZoneFilter(z)}
+              style={{
+                padding: '4px 8px',
+                fontSize: 11,
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+                backgroundColor: zoneFilter === z ? 'var(--colour-primary)' : 'var(--colour-surface-2)',
+                color: zoneFilter === z ? '#fff' : 'var(--colour-text-muted)',
+                border: 'none',
+                borderRadius: 3,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {z === 'both' ? 'All' : z === 'arena' ? 'Arena' : 'Dist X'}
+            </button>
+          ))}
+        </div>
+
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', padding: '0 8px', gap: 4, flexShrink: 0 }}>
           <button
             onClick={() => { setView('schedule'); sessionStorage.setItem('festipals-view', 'schedule') }}
@@ -189,8 +243,8 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
         >
           {view === 'schedule' ? (
             <ScheduleGrid
-              acts={dayActs}
-              stages={lineup.stages}
+              acts={displayedDayActs}
+              stages={displayedStages}
               currentUserId={userId}
               currentUserColour={currentUser.colour}
               currentUserSelections={currentUser.selections}
@@ -200,8 +254,8 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
             />
           ) : (
             <ArtistsList
-              acts={dayActs}
-              allActs={lineup.acts}
+              acts={displayedDayActs}
+              allActs={displayedAllActs}
               stages={lineup.stages}
               festivalDays={lineup.festivalDays}
               activeDay={activeDay}

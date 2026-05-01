@@ -9,6 +9,7 @@ export type Stage = {
   id: string
   name: string
   ordinal: number
+  zone: 'arena' | 'district-x'
 }
 
 export type Act = {
