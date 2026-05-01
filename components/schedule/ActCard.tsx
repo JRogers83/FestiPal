@@ -35,10 +35,6 @@ export const ActCard = memo(function ActCard({
     ? { backgroundColor: userColour }
     : { backgroundColor: 'var(--colour-surface-2)' }
 
-  const borderStyle = isClashing && clashColour
-    ? { border: `2px dashed ${clashColour}` }
-    : { border: '1px solid var(--colour-border)' }
-
   return (
     <button
       onClick={() => onToggle(act.id, isSelected)}
@@ -50,7 +46,8 @@ export const ActCard = memo(function ActCard({
         height: act.headliner ? Math.max(height, 120) : height,
         minHeight: act.headliner ? '120px' : undefined,
         ...bgStyle,
-        ...borderStyle,
+        border: '1px solid var(--colour-border)',
+        boxShadow: isClashing && clashColour ? `inset 0 0 0 3px ${clashColour}` : undefined,
         borderRadius: 4,
         padding: '4px 6px',
         textAlign: 'left',
@@ -62,6 +59,17 @@ export const ActCard = memo(function ActCard({
       }}
       aria-pressed={isSelected}
     >
+      {isClashing && (
+        <span style={{
+          position: 'absolute',
+          top: 3,
+          right: 4,
+          fontSize: 9,
+          lineHeight: 1,
+          opacity: 0.85,
+          pointerEvents: 'none',
+        }}>⚠</span>
+      )}
       <div>
         <p
           className="text-xs font-medium leading-tight"
