@@ -152,6 +152,22 @@ export function PeoplePanel({ userId, currentUser, checkedUserIds, onCheckChange
                 style={{ background: 'none', border: 'none', color: 'var(--colour-text-faint)', cursor: 'pointer', fontSize: 12, lineHeight: 1 }}
               >×</button>
             </div>
+            <div style={{ display: 'flex', gap: 4, marginBottom: 6 }}>
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent('Join my Download 2026 group on Festipals! ' + inviteResult.url)}`}
+                target="_blank" rel="noopener noreferrer"
+                style={{ flex: 1, background: '#25D366', color: '#fff', borderRadius: 3, padding: '4px 0', textAlign: 'center', fontSize: 9, textDecoration: 'none' }}
+              >WhatsApp</a>
+              <a
+                href={`https://t.me/share/url?url=${encodeURIComponent(inviteResult.url)}&text=${encodeURIComponent('Join my Download 2026 group on Festipals!')}`}
+                target="_blank" rel="noopener noreferrer"
+                style={{ flex: 1, background: '#0088cc', color: '#fff', borderRadius: 3, padding: '4px 0', textAlign: 'center', fontSize: 9, textDecoration: 'none' }}
+              >Telegram</a>
+              <a
+                href={`sms:?body=${encodeURIComponent('Join my Download 2026 group on Festipals! ' + inviteResult.url)}`}
+                style={{ flex: 1, background: 'var(--colour-surface)', color: 'var(--colour-text-muted)', border: '1px solid var(--colour-border)', borderRadius: 3, padding: '4px 0', textAlign: 'center', fontSize: 9, textDecoration: 'none' }}
+              >SMS</a>
+            </div>
             <p style={{ fontSize: 9, color: 'var(--colour-text-faint)', margin: 0 }}>Anyone with this link can join. Expires 21 Jun.</p>
           </div>
         ) : (
