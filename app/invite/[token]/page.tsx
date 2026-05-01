@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { randomUUID } from 'crypto'
+import type { Metadata } from 'next'
 import { getInviteByToken, redeemInvite } from '@/lib/db/queries/invites'
 import { createUserWithColour, getUserById } from '@/lib/db/queries/users'
 import { getConnectionsForUser, createDirectConnection } from '@/lib/db/queries/connections'
@@ -8,6 +9,22 @@ import { USER_COLOURS } from '@/constants/colours'
 type Props = {
   params: Promise<{ token: string }>
   searchParams: Promise<{ error?: string }>
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ token: string }> }): Promise<Metadata> {
+  const { token } = await params
+  const invite = await getInviteByToken(token)
+  const isValid = invite && !(invite.expiresAt && invite.expiresAt < new Date())
+  const creator = isValid ? await getUserById(invite.createdBy) : null
+  const creatorName = creator?.nickname ?? 'Someone'
+  return {
+    title: `${creatorName} invited you to Festipals`,
+    openGraph: {
+      title: `${creatorName} invited you to Festipals`,
+      description: 'Join their Download 2026 group — pick your acts, see who clashes.',
+      images: [{ url: '/festipals-burst.webp', width: 1536, height: 1024 }],
+    },
+  }
 }
 
 export default async function InvitePage({ params, searchParams }: Props) {
