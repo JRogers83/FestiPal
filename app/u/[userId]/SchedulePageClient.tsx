@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import type { Lineup, UserWithSelections } from '@/types'
 import { useUser } from '@/lib/hooks/use-user'
 import { useToggleSelection } from '@/lib/hooks/use-selections'
@@ -21,6 +22,7 @@ type Props = {
 }
 
 export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: Props) {
+  const router = useRouter()
   const { data: userData } = useUser(userId)
   const { data: connections = [] } = useConnections(userId)
   const toggleSelection = useToggleSelection(userId)
@@ -107,6 +109,21 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
     toggleSelection.mutate({ actId, selected: isSelected })
   }, [toggleSelection])
 
+  const touchStartX = useRef(0)
+  const touchStartY = useRef(0)
+
+  const handleSwipe = useCallback((e: React.TouchEvent) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current)
+    if (Math.abs(dx) <= 60 || dy > 30) return
+    const daysWithActs = lineup.festivalDays.filter(d =>
+      lineup.acts.some(a => a.festivalDayId === d.id)
+    )
+    const idx = daysWithActs.findIndex(d => d.id === activeDay)
+    const next = dx < 0 ? daysWithActs[idx + 1] : daysWithActs[idx - 1]
+    if (next) router.push(`/u/${userId}?day=${next.id}`)
+  }, [activeDay, lineup, userId, router])
+
   return (
     <div className="flex flex-col h-dvh">
       <Header
@@ -160,6 +177,8 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
         <main
           className="flex-1 overflow-auto"
           style={{ padding: view === 'schedule' ? 8 : 0 }}
+          onTouchStart={e => { touchStartX.current = e.touches[0].clientX; touchStartY.current = e.touches[0].clientY }}
+          onTouchEnd={handleSwipe}
         >
           {view === 'schedule' ? (
             <ScheduleGrid
