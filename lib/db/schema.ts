@@ -57,8 +57,7 @@ export const inviteTokens = pgTable('invite_tokens', {
   token:     uuid('token').primaryKey().defaultRandom(),
   createdBy: uuid('created_by').notNull().references(() => users.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  usedAt:    timestamp('used_at', { withTimezone: true }),
-  usedBy:    uuid('used_by').references(() => users.id),
+  expiresAt: timestamp('expires_at', { withTimezone: true }),
 })
 
 export const connections = pgTable('connections', {

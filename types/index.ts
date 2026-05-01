@@ -49,8 +49,7 @@ export type InviteToken = {
   token: string
   createdBy: string
   createdAt: string
-  usedAt: string | null
-  usedBy: string | null
+  expiresAt: string | null   // null = never expires
 }
 
 export type ConnectionWithUser = {

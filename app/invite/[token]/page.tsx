@@ -19,17 +19,17 @@ export default async function InvitePage({ params, searchParams }: Props) {
     return <InviteError message="This invite link is invalid or has expired." />
   }
 
-  // Token already used — someone already accepted it
-  if (invite.usedAt) {
-    return <InviteError message="This invite link has already been used. Ask your friend to send you a new one." />
+  // Token expired
+  if (invite.expiresAt && invite.expiresAt < new Date()) {
+    return <InviteError message="This invite link has expired. Ask your friend to share a new one." />
   }
 
   // Error surfaced from a failed accept attempt (e.g. self_invite)
   if (error === 'self_invite') {
     return <InviteError message="You can't accept your own invite link — send it to a friend instead." />
   }
-  if (error === 'already_used') {
-    return <InviteError message="This invite link has already been used." />
+  if (error === 'expired') {
+    return <InviteError message="This invite link has expired." />
   }
 
   // Look up the inviter's nickname for display
