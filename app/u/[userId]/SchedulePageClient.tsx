@@ -34,7 +34,12 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
     selections: [],
   }
 
-  const [view, setView] = useState<'schedule' | 'artists'>('schedule')
+  const [view, setView] = useState<'schedule' | 'artists'>(() => {
+    if (typeof window === 'undefined') return 'schedule'
+    const saved = sessionStorage.getItem('festipals-view')
+    if (saved === 'schedule' || saved === 'artists') return saved as 'schedule' | 'artists'
+    return window.innerWidth < 768 ? 'artists' : 'schedule'
+  })
 
   // Track IDs the user has explicitly unchecked. Everyone else (self + all
   // connections) is checked by default, including newly joined members.
@@ -103,7 +108,7 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
   }, [toggleSelection])
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-dvh">
       <Header
         userId={userId}
         nickname={currentUser.nickname}
@@ -115,7 +120,7 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
         <DayTabs days={lineup.festivalDays} activeDay={activeDay} userId={userId} />
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', padding: '0 8px', gap: 4, flexShrink: 0 }}>
           <button
-            onClick={() => setView('schedule')}
+            onClick={() => { setView('schedule'); sessionStorage.setItem('festipals-view', 'schedule') }}
             title="Schedule view"
             style={{
               padding: '4px 10px',
@@ -132,7 +137,7 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
             Grid
           </button>
           <button
-            onClick={() => setView('artists')}
+            onClick={() => { setView('artists'); sessionStorage.setItem('festipals-view', 'artists') }}
             title="Artists list"
             style={{
               padding: '4px 10px',
