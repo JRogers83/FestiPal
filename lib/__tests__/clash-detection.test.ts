@@ -25,45 +25,47 @@ const makeUser = (id: string, colour: string, selections: string[]): UserWithSel
 describe('detectClashes', () => {
   it('returns empty array when only one user', () => {
     const acts = [makeAct({ id: 'a1', startTime: '13:00', endTime: '14:00' })]
-    const users = [makeUser('user-1', 'blue', ['a1'])]
-    expect(detectClashes(users, acts)).toHaveLength(0)
+    expect(detectClashes([makeUser('u1', 'blue', ['a1'])], acts)).toHaveLength(0)
   })
 
   it('returns empty array when users pick same act on same stage', () => {
-    const acts = [makeAct({ id: 'a1', stageId: 'main-stage', startTime: '13:00', endTime: '14:00' })]
-    const users = [
-      makeUser('user-1', 'blue', ['a1']),
-      makeUser('user-2', 'green', ['a1']),
-    ]
-    // Same stage — not a clash
+    const acts = [makeAct({ id: 'a1', stageId: 'main-stage' })]
+    const users = [makeUser('u1', 'blue', ['a1']), makeUser('u2', 'green', ['a1'])]
     expect(detectClashes(users, acts)).toHaveLength(0)
   })
 
-  it('detects a clash when acts on different stages overlap in time', () => {
+  it('detects a clash when acts on different stages overlap', () => {
     const acts = [
       makeAct({ id: 'a1', stageId: 'main-stage',   startTime: '13:00', endTime: '14:00' }),
       makeAct({ id: 'a2', stageId: 'second-stage', startTime: '13:30', endTime: '14:30' }),
     ]
-    const users = [
-      makeUser('user-1', 'blue',  ['a1']),
-      makeUser('user-2', 'green', ['a2']),
-    ]
+    const users = [makeUser('u1', 'blue', ['a1']), makeUser('u2', 'green', ['a2'])]
     const clashes = detectClashes(users, acts)
     expect(clashes).toHaveLength(1)
     expect(clashes[0].personA.act.id).toBe('a1')
     expect(clashes[0].personB.act.id).toBe('a2')
+    expect(clashes[0].overlapStart).toBe('13:30')
   })
 
-  it('does not clash when acts on different stages are sequential', () => {
+  it('overlapStart is the later start time, not the earlier', () => {
+    const acts = [
+      makeAct({ id: 'a1', stageId: 'main-stage',   startTime: '13:00', endTime: '14:30' }),
+      makeAct({ id: 'a2', stageId: 'second-stage', startTime: '13:45', endTime: '14:45' }),
+    ]
+    const users = [makeUser('u1', 'blue', ['a1']), makeUser('u2', 'green', ['a2'])]
+    const [clash] = detectClashes(users, acts)
+    expect(clash.overlapStart).toBe('13:45')
+  })
+
+  it('does not clash when acts are sequential', () => {
     const acts = [
       makeAct({ id: 'a1', stageId: 'main-stage',   startTime: '13:00', endTime: '14:00' }),
       makeAct({ id: 'a2', stageId: 'second-stage', startTime: '14:00', endTime: '15:00' }),
     ]
-    const users = [
-      makeUser('user-1', 'blue',  ['a1']),
-      makeUser('user-2', 'green', ['a2']),
-    ]
-    expect(detectClashes(users, acts)).toHaveLength(0)
+    expect(detectClashes(
+      [makeUser('u1', 'blue', ['a1']), makeUser('u2', 'green', ['a2'])],
+      acts
+    )).toHaveLength(0)
   })
 
   it('does not clash when acts are on different festival days', () => {
@@ -71,41 +73,38 @@ describe('detectClashes', () => {
       makeAct({ id: 'a1', stageId: 'main-stage',   festivalDayId: 'friday',   startTime: '13:00', endTime: '14:00' }),
       makeAct({ id: 'a2', stageId: 'second-stage', festivalDayId: 'saturday', startTime: '13:30', endTime: '14:30' }),
     ]
-    const users = [
-      makeUser('user-1', 'blue',  ['a1']),
-      makeUser('user-2', 'green', ['a2']),
-    ]
-    expect(detectClashes(users, acts)).toHaveLength(0)
+    expect(detectClashes(
+      [makeUser('u1', 'blue', ['a1']), makeUser('u2', 'green', ['a2'])],
+      acts
+    )).toHaveLength(0)
   })
 
-  it('handles midnight-spanning acts correctly', () => {
+  it('handles midnight-spanning acts', () => {
     const acts = [
-      // 23:30 → 00:30 (spans midnight)
       makeAct({ id: 'a1', stageId: 'main-stage',   startTime: '23:30', endTime: '00:30' }),
-      // 23:45 → 00:15 (also spans midnight, overlaps)
       makeAct({ id: 'a2', stageId: 'second-stage', startTime: '23:45', endTime: '00:15' }),
     ]
-    const users = [
-      makeUser('user-1', 'blue',  ['a1']),
-      makeUser('user-2', 'green', ['a2']),
-    ]
-    expect(detectClashes(users, acts)).toHaveLength(1)
+    const clashes = detectClashes(
+      [makeUser('u1', 'blue', ['a1']), makeUser('u2', 'green', ['a2'])],
+      acts
+    )
+    expect(clashes).toHaveLength(1)
+    expect(clashes[0].overlapStart).toBe('23:45')
   })
 
-  it('returns clash info with correct user and act details', () => {
+  it('confirmed live clash: Creeper vs Pendulum — overlapStart 16:10 not 15:50', () => {
+    // Real data from live browser testing (festipals-review-claude-2026-05-01.md)
     const acts = [
-      makeAct({ id: 'a1', name: 'Band A', stageId: 'main-stage',   startTime: '15:00', endTime: '16:00' }),
-      makeAct({ id: 'a2', name: 'Band B', stageId: 'second-stage', startTime: '15:30', endTime: '16:30' }),
+      makeAct({ id: 'fri-opus-4', name: 'Creeper',  stageId: 'opus-stage',  startTime: '15:50', endTime: '16:30' }),
+      makeAct({ id: 'fri-apex-4', name: 'Pendulum', stageId: 'apex-stage',  startTime: '16:10', endTime: '17:00' }),
     ]
     const users = [
-      makeUser('alice', '#3b82f6', ['a1']),
-      makeUser('bob',   '#22c55e', ['a2']),
+      makeUser('anonymous', '#22c55e', ['fri-opus-4']),
+      makeUser('jonathan',  '#3b82f6', ['fri-apex-4']),
     ]
     const [clash] = detectClashes(users, acts)
-    expect(clash.personA.userId).toBe('alice')
-    expect(clash.personA.colour).toBe('#3b82f6')
-    expect(clash.personA.act.name).toBe('Band A')
-    expect(clash.personB.userId).toBe('bob')
-    expect(clash.personB.act.name).toBe('Band B')
+    expect(clash.overlapStart).toBe('16:10')
+    expect(clash.personA.act.name).toBe('Creeper')
+    expect(clash.personB.act.name).toBe('Pendulum')
   })
 })

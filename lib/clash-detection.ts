@@ -1,9 +1,9 @@
-import { timeToMinutes, adjustedEndMinutes } from './time'
+import { timeToMinutes, adjustedEndMinutes, formatTime } from './time'
 import type { Act, UserWithSelections, ClashPair } from '@/types'
 
 function actsOverlap(a: Act, b: Act): boolean {
   if (a.festivalDayId !== b.festivalDayId) return false
-  if (a.stageId === b.stageId) return false  // same stage = not a user scheduling conflict
+  if (a.stageId === b.stageId) return false
 
   const aStart = timeToMinutes(a.startTime)
   const aEnd   = adjustedEndMinutes(a.startTime, a.endTime)
@@ -28,9 +28,13 @@ export function detectClashes(users: UserWithSelections[], acts: Act[]): ClashPa
           const actB = actMap.get(idB)
           if (!actA || !actB) continue
           if (actsOverlap(actA, actB)) {
+            const overlapStartRaw = timeToMinutes(actA.startTime) > timeToMinutes(actB.startTime)
+              ? actA.startTime
+              : actB.startTime
             clashes.push({
-              personA: { userId: ua.id, nickname: ua.nickname, colour: ua.colour, act: actA },
-              personB: { userId: ub.id, nickname: ub.nickname, colour: ub.colour, act: actB },
+              personA:      { userId: ua.id, nickname: ua.nickname, colour: ua.colour, act: actA },
+              personB:      { userId: ub.id, nickname: ub.nickname, colour: ub.colour, act: actB },
+              overlapStart: formatTime(overlapStartRaw),
             })
           }
         }

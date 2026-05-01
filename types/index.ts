@@ -43,6 +43,7 @@ export type UserWithSelections = User & {
 export type ClashPair = {
   personA: { userId: string; nickname: string; colour: string; act: Act }
   personB: { userId: string; nickname: string; colour: string; act: Act }
+  overlapStart: string   // "HH:MM" — max(actA.startTime, actB.startTime), the real conflict start
 }
 
 export type InviteToken = {

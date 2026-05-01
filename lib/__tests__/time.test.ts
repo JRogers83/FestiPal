@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { timeToMinutes, adjustedEndMinutes, dayBounds, minutesToPx, PX_PER_MINUTE } from '../time'
+import { timeToMinutes, adjustedEndMinutes, dayBounds, minutesToPx, PX_PER_MINUTE, formatTime } from '../time'
 
 describe('timeToMinutes', () => {
   it('converts "00:00" to 0', () => expect(timeToMinutes('00:00')).toBe(0))
@@ -50,4 +50,16 @@ describe('minutesToPx', () => {
   it('returns 0 for 0 minutes', () => expect(minutesToPx(0)).toBe(0))
   it('returns 120 for 60 minutes (2px per minute)', () => expect(minutesToPx(60)).toBe(120))
   it('uses PX_PER_MINUTE constant', () => expect(PX_PER_MINUTE).toBe(2))
+})
+
+describe('formatTime', () => {
+  it('strips seconds from HH:MM:SS', () => {
+    expect(formatTime('15:50:00')).toBe('15:50')
+  })
+  it('preserves HH:MM with no seconds', () => {
+    expect(formatTime('09:05')).toBe('09:05')
+  })
+  it('handles leading zeros', () => {
+    expect(formatTime('08:00:00')).toBe('08:00')
+  })
 })
