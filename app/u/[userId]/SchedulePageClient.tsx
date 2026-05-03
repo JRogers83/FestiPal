@@ -164,70 +164,72 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
         colour={currentUser.colour}
       />
 
-      {/* Tab bar: day tabs + zone filter + schedule/artists view toggle */}
-      <div style={{ display: 'flex', alignItems: 'stretch', borderBottom: '1px solid var(--colour-border)', overflow: 'hidden' }}>
-        <DayTabs days={lineup.festivalDays} activeDay={activeDay} userId={userId} />
+      {/* Tab bar — two rows on mobile (<640px), single row on desktop */}
+      <div className="tab-bar">
 
-        {/* Zone filter */}
-        <div style={{ display: 'flex', alignItems: 'center', padding: '0 6px', gap: 3, flexShrink: 0, borderRight: '1px solid var(--colour-border)' }}>
-          {(['both', 'arena', 'district-x'] as const).map(z => (
-            <button
-              key={z}
-              onClick={() => setZoneFilter(z)}
-              style={{
-                padding: '4px 8px',
-                fontSize: 11,
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em',
-                backgroundColor: zoneFilter === z ? 'var(--colour-primary)' : 'var(--colour-surface-2)',
-                color: zoneFilter === z ? '#fff' : 'var(--colour-text-muted)',
-                border: 'none',
-                borderRadius: 3,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {z === 'both' ? 'All' : z === 'arena' ? 'Arena' : 'Dist X'}
-            </button>
-          ))}
+        {/* Row 1: day tabs — full width on mobile, flex-1 on desktop */}
+        <div className="tab-bar-days">
+          <DayTabs days={lineup.festivalDays} activeDay={activeDay} userId={userId} />
         </div>
 
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', padding: '0 8px', gap: 4, flexShrink: 0 }}>
-          <button
-            onClick={() => { setView('schedule'); sessionStorage.setItem('festipals-view', 'schedule') }}
-            title="Schedule view"
-            style={{
-              padding: '4px 10px',
-              fontSize: 13,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              backgroundColor: view === 'schedule' ? 'var(--colour-primary)' : 'var(--colour-surface-2)',
-              color: view === 'schedule' ? '#fff' : 'var(--colour-text-muted)',
-              border: 'none',
-              borderRadius: 3,
-              cursor: 'pointer',
-            }}
-          >
-            Grid
-          </button>
-          <button
-            onClick={() => { setView('artists'); sessionStorage.setItem('festipals-view', 'artists') }}
-            title="Artists list"
-            style={{
-              padding: '4px 10px',
-              fontSize: 13,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              backgroundColor: view === 'artists' ? 'var(--colour-primary)' : 'var(--colour-surface-2)',
-              color: view === 'artists' ? '#fff' : 'var(--colour-text-muted)',
-              border: 'none',
-              borderRadius: 3,
-              cursor: 'pointer',
-            }}
-          >
-            Artists
-          </button>
+        {/* Row 2 on mobile / same row on desktop: zone filter + view toggle */}
+        <div className="tab-bar-controls">
+          {/* Zone filter */}
+          <div style={{ display: 'flex', alignItems: 'center', padding: '0 8px', gap: 4, flex: 1 }}>
+            {(['both', 'arena', 'district-x'] as const).map(z => (
+              <button
+                key={z}
+                onClick={() => setZoneFilter(z)}
+                style={{
+                  flex: 1,
+                  padding: '5px 0',
+                  fontSize: 11,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  backgroundColor: zoneFilter === z ? 'var(--colour-primary)' : 'var(--colour-surface-2)',
+                  color: zoneFilter === z ? '#fff' : 'var(--colour-text-muted)',
+                  border: 'none',
+                  borderRadius: 3,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  textAlign: 'center',
+                }}
+              >
+                {z === 'both' ? 'All' : z === 'arena' ? 'Arena' : 'Dist X'}
+              </button>
+            ))}
+          </div>
+
+          {/* Divider */}
+          <div style={{ width: 1, alignSelf: 'stretch', margin: '6px 0', backgroundColor: 'var(--colour-border)' }} />
+
+          {/* View toggle */}
+          <div style={{ display: 'flex', alignItems: 'center', padding: '0 8px', gap: 4, flex: 1, justifyContent: 'flex-end' }}>
+            {(['schedule', 'artists'] as const).map(v => (
+              <button
+                key={v}
+                onClick={() => { setView(v); sessionStorage.setItem('festipals-view', v) }}
+                title={v === 'schedule' ? 'Schedule view' : 'Artists list'}
+                style={{
+                  flex: 1,
+                  padding: '5px 0',
+                  fontSize: 11,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  backgroundColor: view === v ? 'var(--colour-primary)' : 'var(--colour-surface-2)',
+                  color: view === v ? '#fff' : 'var(--colour-text-muted)',
+                  border: 'none',
+                  borderRadius: 3,
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                }}
+              >
+                {v === 'schedule' ? 'Grid' : 'Artists'}
+              </button>
+            ))}
+          </div>
         </div>
+
       </div>
 
       <div className="flex flex-1 overflow-hidden">

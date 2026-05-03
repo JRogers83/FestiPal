@@ -163,6 +163,27 @@ h1, h2, h3 {
   letter-spacing: 0.05em;
 }
 
+/* ── Tab bar: two rows on mobile, single row on desktop ── */
+.tab-bar {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--colour-border);
+  overflow: hidden;
+}
+.tab-bar-days {
+  border-bottom: 1px solid var(--colour-border);
+}
+.tab-bar-controls {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+}
+@media (min-width: 640px) {
+  .tab-bar            { flex-direction: row; align-items: stretch; }
+  .tab-bar-days       { border-bottom: none; flex: 1; min-width: 0; }
+  .tab-bar-controls   { border-left: 1px solid var(--colour-border); }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
