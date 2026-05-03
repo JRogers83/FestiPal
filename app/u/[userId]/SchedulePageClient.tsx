@@ -232,7 +232,7 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
 
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1" style={{ overflow: 'clip' }}>
         <main
           className="flex-1 overflow-auto"
           style={{ padding: view === 'schedule' ? 8 : 0 }}
