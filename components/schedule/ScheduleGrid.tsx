@@ -90,14 +90,12 @@ export function ScheduleGrid({
         {stages.map(stage => (
           <div key={stage.id} className="flex flex-col" style={{ flex: '1 1 0', minWidth: 140, maxWidth: 280 }}>
             <div
-              className="z-10 h-10 flex items-center justify-center px-2
+              className="sticky top-0 z-10 h-10 flex items-center justify-center px-2
                          border-b-2 text-xs font-medium uppercase tracking-wide truncate"
               style={{
                 backgroundColor: 'var(--colour-surface)',
                 borderBottomColor: 'var(--colour-primary)',
                 color: 'var(--colour-text)',
-                transform: 'translateY(var(--scroll-top, 0px))',
-                position: 'relative',
               }}
             >
               {stage.name}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Lineup, UserWithSelections } from '@/types'
 import { useUser } from '@/lib/hooks/use-user'
@@ -141,15 +141,6 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
   const touchStartX  = useRef(0)
   const touchStartY  = useRef(0)
   const touchInGrid  = useRef(false)
-  const mainRef      = useRef<HTMLElement>(null)
-
-  // Reset scroll position and CSS variable when switching days
-  useEffect(() => {
-    if (mainRef.current) {
-      mainRef.current.scrollTop = 0
-      mainRef.current.style.setProperty('--scroll-top', '0px')
-    }
-  }, [activeDay])
 
   const handleSwipe = useCallback((e: React.TouchEvent) => {
     // Don't change day if the gesture started inside the horizontal grid scroller
@@ -243,15 +234,8 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
 
       <div className="flex flex-1" style={{ overflow: 'clip' }}>
         <main
-          ref={mainRef}
           className="flex-1 overflow-auto"
           style={{ padding: view === 'schedule' ? 8 : 0 }}
-          onScroll={e => {
-            (e.currentTarget as HTMLElement).style.setProperty(
-              '--scroll-top',
-              `${(e.currentTarget as HTMLElement).scrollTop}px`
-            )
-          }}
           onTouchStart={e => {
             touchStartX.current = e.touches[0].clientX
             touchStartY.current = e.touches[0].clientY
