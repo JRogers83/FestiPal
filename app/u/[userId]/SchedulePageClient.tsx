@@ -234,8 +234,11 @@ export function SchedulePageClient({ userId, initialUser, lineup, activeDay }: P
 
       <div className="flex flex-1" style={{ overflow: 'clip' }}>
         <main
-          className="flex-1 overflow-auto"
-          style={{ padding: view === 'schedule' ? 8 : 0 }}
+          className="flex-1"
+          style={{
+            overflow: view === 'schedule' ? 'hidden' : 'auto',
+            padding: view === 'artists' ? 0 : 0,
+          }}
           onTouchStart={e => {
             touchStartX.current = e.touches[0].clientX
             touchStartY.current = e.touches[0].clientY
