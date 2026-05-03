@@ -80,9 +80,9 @@ export function ScheduleGrid({
 
   return (
     <div
-      className="overflow-x-auto overflow-y-hidden"
+      className="overflow-x-auto"
       data-no-swipe-days="true"
-      style={{ overscrollBehaviorX: 'contain' }}
+      style={{ overflowY: 'clip', overscrollBehaviorX: 'contain' }}
     >
       <div className="flex min-w-max">
         <TimeAxis timeSlots={timeSlots} gridHeight={gridHeight} />
